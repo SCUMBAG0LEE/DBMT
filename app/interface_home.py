@@ -62,7 +62,7 @@ class MainPageWidget(QFrame):
 
         # 设置水平布局，方便追加元素
         self.hBoxLayout = QHBoxLayout(self)
-        self.hBoxLayout.addWidget(WelcomeBar("欢迎使用DBMT(DirectX Buffer Mod Tool)","此工具献给所有热爱游戏Mod的玩家们  --NicoMico"))
+        self.hBoxLayout.addWidget(WelcomeBar("欢迎使用DBMT(DirectX Buffer Mod Tool)","专业级DirectX Mod工具箱  --NicoMico"))
         self.hBoxLayout.setAlignment(Qt.AlignTop| Qt.AlignLeft)
 
         
