@@ -47,3 +47,4 @@ QQ群：少女前线2Mod交流群 857993507
 - https://github.com/SpectrumQT/WWMI-TOOLS
 - https://github.com/leotorrez/XXMITools
 - https://github.com/SpectrumQT/XXMI-Launcher
+

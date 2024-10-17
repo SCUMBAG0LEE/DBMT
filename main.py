@@ -19,8 +19,5 @@ if __name__ == "__main__":
     # 创建主窗口
     dbmt_widnow = MainWindow()
 
-    # 显示窗口
-    dbmt_widnow.show()
-
     # 程序进入循环等待状态
     app.exec()

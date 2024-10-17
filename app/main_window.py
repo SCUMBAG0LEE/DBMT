@@ -76,9 +76,12 @@ class MainWindow(FluentWindow):
         self.setWindowIcon(QIcon(':/NicoMico.ico'))
         self.setWindowTitle('DirectX Buffer Mod Tool V1.0.2.3')
 
+        # 设置显示在屏幕中央
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
+
+        # 显示窗口
         self.show()
         
         QApplication.processEvents()
