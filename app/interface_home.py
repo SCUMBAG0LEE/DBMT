@@ -37,7 +37,7 @@ class WelcomeBar(QWidget):
         self.buttonLayout.setContentsMargins(0, 0, 0, 0)
         self.buttonLayout.addWidget(self.documentButton, 0, Qt.AlignLeft)
         self.buttonLayout.addWidget(self.sourceButton, 0, Qt.AlignLeft)
-        # self.buttonLayout.addStretch(1)   Stretch就是隔老远，不用打开
+        # self.buttonLayout.addStretch(1)   Stretch to split widgets like spring but we don't need it here.
         self.buttonLayout.addWidget(self.supportButton, 0, Qt.AlignLeft)
         self.buttonLayout.addWidget(self.feedbackButton, 0, Qt.AlignLeft)
         self.buttonLayout.setAlignment(Qt.AlignLeft)
