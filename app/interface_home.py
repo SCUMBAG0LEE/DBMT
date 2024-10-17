@@ -55,6 +55,7 @@ class WelcomeBar(QWidget):
 class MainPageWidget(QFrame):
 
     def __init__(self, text: str, parent=None):
+        # we have to run parent's __init__ function before our logic.
         super().__init__(parent=parent)
 
         # 必须给子界面设置全局唯一的对象名

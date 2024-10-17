@@ -7,17 +7,17 @@ from qfluentwidgets import FluentTranslator
 
 from app.main_window import MainWindow
 
-# DPI相关设置
+# DPI Settings
 # QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 # QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 # QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
 if __name__ == "__main__":
-    # 创建QApplication对象
+    # QApplication
     app = QApplication(sys.argv)
 
-    # 创建主窗口
+    # DBMT window
     dbmt_widnow = MainWindow()
 
-    # 程序进入循环等待状态
+    # loop and wait for quit.
     app.exec()

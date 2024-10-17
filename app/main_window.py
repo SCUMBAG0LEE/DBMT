@@ -29,27 +29,21 @@ class Widget(QFrame):
 class MainWindow(FluentWindow):
 
     def __init__(self):
+        # have to run parent's __init__ before our logic.
         super().__init__()
-
 
         # 创建子界面，实际使用时将 Widget 换成自己的子界面
         self.homeInterface = MainPageWidget('Home', self)
 
         self.dbmtInterface = Widget('DBMT', self)
 
-        self.reverseInterface = Widget('Mod逆向', self)
-    
-
-        self.encryptionInterface = Widget('Mod加密', self)
-        
-        self.protectInterface = Widget('资产保护', self)
-        # wdt =  Widget('Setting Interface', self)
-        # btn = PushButton(wdt)
-        # btn.setText("测试")
-        # 这里添加了按钮默认会放到左上角，怎么才能设置样式和位置？
-
+   
         self.settingInterface = Widget('Settings', self)
-        
+
+
+        # self.reverseInterface = Widget('Mod逆向', self)
+        # self.encryptionInterface = Widget('Mod加密', self)
+        # self.protectInterface = Widget('资产保护', self)
 
         self.initNavigation()
         self.initWindow()
@@ -59,29 +53,33 @@ class MainWindow(FluentWindow):
         pass
         self.addSubInterface(self.dbmtInterface, FluentIcon.CALORIES, 'Mod制作')
 
-        # TODO 后续改为检测到插件再显示插件界面
-        self.addSubInterface(self.reverseInterface, FluentIcon.CANCEL, 'Mod逆向')
-        self.addSubInterface(self.encryptionInterface, FluentIcon.IOT, 'Mod加密')
-        self.addSubInterface(self.protectInterface, FluentIcon.VPN, '资产保护')
+        # plugins will be add later.
+        # self.addSubInterface(self.reverseInterface, FluentIcon.CANCEL, 'Mod逆向')
+        # self.addSubInterface(self.encryptionInterface, FluentIcon.IOT, 'Mod加密')
+        # self.addSubInterface(self.protectInterface, FluentIcon.VPN, '资产保护')
 
         self.addSubInterface(self.settingInterface, FluentIcon.SETTING, 'Settings', NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        # 设置窗口大小
+        # Set widnow size.
         self.resize(1000, 680)
-        # 设置最小宽度
+
+        # We don't need this ,but might be useful so keep it here.
         # self.setMinimumWidth(600)
 
-        # TODO 后续添加图标
-        self.setWindowIcon(QIcon(':/NicoMico.ico'))
-        self.setWindowTitle('DirectX Buffer Mod Tool V1.0.2.3')
+        # This can't show on PyQt-Fluent-Widget's window,anyway we keep it for fun.
+        # self.setWindowIcon(QIcon('NicoMico.ico'))
 
-        # 设置显示在屏幕中央
+        # Set window title.
+        self.setWindowTitle('DirectX Buffer Mod Tool')
+
+        # set window on center screen.
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
 
-        # 显示窗口
+        # show window.
         self.show()
         
+        # I don't know if this processEvents() can be deleted ,but for compatible reason we add it here.
         QApplication.processEvents()
