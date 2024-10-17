@@ -52,7 +52,8 @@ If you must use an exe file compiled by others, please check it with multiple an
 Users of this tool must bear all responsibilities and consequences, which are unrelated to the developers of this repository. See LICENSE for details.
 
 # Feedback Submission and Development Communication
-QQ Group: Girls' Frontline 2 Mod Group 857993507 
+ShaderFreedom Discord: https://discord.gg/eCXdNyVnsM
+
 
 # Inspiration Sources
 - https://github.com/Zzaphkiel/Seraphine
