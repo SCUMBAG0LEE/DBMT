@@ -1,7 +1,7 @@
 in WWMI these two shader being replaced with custom shader ShapeKeyMultiplier.hlsl and ShapeKeyLoader.hlsl
 ----------------------------------------------------------------------------------------------------
-7a8396180d416117            ShapeKeyLoader.hlsl
-3222cf3da3006e93            ShapeKeyMultiplier.hlsl
+7a8396180d416117            ShapeKeyMultiplier.hlsl
+3222cf3da3006e93            ShapeKeyLoader.hlsl
 so WWMI should first run ShapeKeyMultiplier.hlsl and then run ShapeKeyLoader.hlsl
 put here as reference.
 ----------------------------------------------------------------------------------------------------
@@ -78,8 +78,8 @@ but it do need much more time than i think to learn.
 ----------------------------------------------------------------------------------------------------
 
 we have know how the two compute shader for shape key in WWMI works:
-3222cf3da3006e93            ShapeKeyMultiplier.hlsl
-7a8396180d416117            ShapeKeyLoader.hlsl
+3222cf3da3006e93            ShapeKeyLoader.hlsl
+7a8396180d416117            ShapeKeyMultiplier.hlsl
 
 but we still don't know about:
 - ShapeKeyApplier.hlsl 
@@ -92,10 +92,13 @@ so we learn it's mod ini and invest more time on it.
 - [CommandListDisableShapeKeyOverride] and SkapeKeySetter.hlsl is never used in V0.70.
 
 so here is the final work process for shape key data:
-- ShapeKeyOverrider.hlsl
-- 3222cf3da3006e93            ShapeKeyMultiplier.hlsl
-- 7a8396180d416117            ShapeKeyLoader.hlsl
+- ShapeKeyOverrider.hlsl                                    [Build a Constant Buffer]
+- 3222cf3da3006e93            ShapeKeyLoader.hlsl           [Simple translation and modify to CS from game's original shader]
+- 7a8396180d416117            ShapeKeyMultiplier.hlsl       [Simple translation and modify to CS from game's original shader]
 
 it use ShapeKeyOverrider.hlsl to build a constant buffer for ShapeKeyLoader.hlsl 
 
-
+----------------------------------------------------------------------------------------------------
+we finally know how it's ShapeKey works, now we should develop blender plugin to support it
+luckly we have SpectrumQT , we will [Standing on the Shoulder of Giants] so will save a lot of my time.
+new plugin will be DBMT-Unreal
