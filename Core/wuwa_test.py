@@ -65,7 +65,17 @@ if __name__ == "__main__":
     # reference WWMI, to calculate a shape key ,we get ShapeKeyVertexId cs-t0 and ShapeKeyVertexOffset cs-t1 
     # and we need ShapeKeyOffset, it looks comes from cs-cb0
     # we need to see how it's shader work to figure out how to extract ShapeKeyOffset from cs-cb0.
-    
+
+    # WWMI settings:
+    # ShapeKeyOffset        fixed size 512/ fixed stride 16 =fixed num 32   Slot:cs-cb0
+    # ShapeKeyVertexId      fixed stride = 4                                Slot:cs-t0
+    # ShapeKeyVertexOffset  fixed stride = 2                                Slot:cs-t1
+    # ShapeKeyScale         fixed stride = 4                                Slot:cs-u1
+    # ShapeKeyBuffer        fixed stride = 24                               Slot:vb6 / hash replace
+
+    # WuWa original settings:
+    # 
+
 
 
 
