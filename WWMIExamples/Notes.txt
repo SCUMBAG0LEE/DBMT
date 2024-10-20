@@ -1,0 +1,101 @@
+in WWMI these two shader being replaced with custom shader ShapeKeyMultiplier.hlsl and ShapeKeyLoader.hlsl
+----------------------------------------------------------------------------------------------------
+7a8396180d416117            ShapeKeyLoader.hlsl
+3222cf3da3006e93            ShapeKeyMultiplier.hlsl
+so WWMI should first run ShapeKeyMultiplier.hlsl and then run ShapeKeyLoader.hlsl
+put here as reference.
+----------------------------------------------------------------------------------------------------
+
+(how did SpectrumQT have so many experiences in hlsl develop? especially in convert asm code to hlsl? amazing.)
+
+To learn HLSL completely, i guess this document must be learn:
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-reference
+
+Here is some page important for HLSL syntax:
+
+How to declare variable? the syntax is there.
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-variable-syntax
+
+From syntax, we meet the most complex thing in HLSL, the data type:
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-data-types
+
+We not only get Data Type, we need to learn all these types in Microsoft Document:
+at least we need to recognize and know how it means.
+
+- Per-Component Math Operations         [Basic rule of HLSL calculation,very important]
+
+- Data Types (this contains Buffer,Scalar,Vector,Matrix and all others,just a category name)
+- Buffer Type                           [important]
+- Scalar Type                           [important]
+- Vector Type                           [important]
+- Matrix Type                           [important]
+- Struct Type                           [important]
+
+- Texture Type                          [Pixel Shader always like use this]
+
+- Shader Type                           [As i know, this never used in 3Dmigoto and it's hlsl, skip this]
+- Sampler Type                          [Maybe used in future technique: VAT-PreSkinning by custom shader, skip this]
+- State Object Type                     [Never used, skip this]
+- User-Defined Type                     [Never use this unless you want make hlsl more hard to read]
+
+We meet Buffer type in 3dmgioto's shader dump very frequently, here is mainly two of them:
+Buffer and StructedBuffer.
+
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-buffer
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/sm5-object-structuredbuffer
+
+But document only tell us Buffer and StructedBuffer, when we use ,we use all kinds of these buffers:
+- Buffer
+- ByteAddressBuffer
+- ConsumeStructuredBuffer
+- RWBuffer
+- RWByteAddressBuffer
+- RWStructuredBuffer
+- StructuredBuffer
+
+for 3dmigoto the most frequently used HLSL syntax is from Shader Model 5.0,
+but that doesn't mean other Shader Model is not need to learn, to make some thing new and great,
+we need to at least know all them, and Shader Model 5.0 is the most important and frequently used.
+
+in HLSL, calculation is executed per-component,you have to know this before learn all other features in HLSL:
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-per-component-math
+
+
+Flow Control:
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-flow-control
+
+Functions:
+https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-functions
+
+HLSL is simple to learn, may need 10 hours to learn the basic 
+the time-consuming thing is :
+1.how to convert ASM code into HLSL 
+2.how convert HLSL into ASM code.
+3.design algorithm in HLSL, debug thousand times and keep try until it work.
+
+finally i need to say, HLSL and it's ASM code is not that hard as i think,
+but it do need much more time than i think to learn.
+----------------------------------------------------------------------------------------------------
+
+we have know how the two compute shader for shape key in WWMI works:
+3222cf3da3006e93            ShapeKeyMultiplier.hlsl
+7a8396180d416117            ShapeKeyLoader.hlsl
+
+but we still don't know about:
+- ShapeKeyApplier.hlsl 
+- ShapeKeyOverrider.hlsl
+- SkapeKeySetter.hlsl (this might be a mistake on spell, or what is SkapeKey ? whatever we take it as ShapeKeySetter.hlsl)
+
+so we learn it's mod ini and invest more time on it.
+- from mod.ini we know it first call ShapeKeyOverrider.hlsl .
+- [CustomShaderShapeKeyApplier] and ShapeKeyApplier.hlsl is never used in V0.70.
+- [CommandListDisableShapeKeyOverride] and SkapeKeySetter.hlsl is never used in V0.70.
+
+so here is the final work process for shape key data:
+- ShapeKeyOverrider.hlsl
+- 3222cf3da3006e93            ShapeKeyMultiplier.hlsl
+- 7a8396180d416117            ShapeKeyLoader.hlsl
+
+it use ShapeKeyOverrider.hlsl to build a constant buffer for ShapeKeyLoader.hlsl 
+
+
