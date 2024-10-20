@@ -5,7 +5,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication
 from qfluentwidgets import FluentTranslator
 
-from app.main_window import MainWindow
+from GUI.main_window import MainWindow
 
 # DPI Settings
 # QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)

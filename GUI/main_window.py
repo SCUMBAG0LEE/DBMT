@@ -10,6 +10,7 @@ from PyQt5.QtCore import Qt, QTranslator
 from PyQt5.QtCore import Qt, pyqtSignal, QUrl, QEvent
 
 from app.interface_home import MainPageWidget
+from app.interface_setting import SettingPageWidget
 
 # TODO 临时占位QFrame，后面换成自己的
 class Widget(QFrame):
@@ -37,8 +38,7 @@ class MainWindow(FluentWindow):
 
         self.dbmtInterface = Widget('DBMT', self)
 
-   
-        self.settingInterface = Widget('Settings', self)
+        self.settingInterface = SettingPageWidget("Setting",self)
 
 
         # self.reverseInterface = Widget('Mod逆向', self)
