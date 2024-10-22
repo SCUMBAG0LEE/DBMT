@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     # so we guess 000003 and 00004 calculate part of the shape key, may be mouse and eye?
     # 000003 CS 3222cf3da3006e93 disable it will make character lose face emotion.
-    # 000004 CS 7a8396180d416117 disable it will make character face disappear.
+    # 000004 CS 7a8396180d416117 disable it will make character face disappear. 
     # two of them works together to generate a shape key buffer to make character have emotion.
 
     # reference WWMI, to calculate a shape key ,we get ShapeKeyVertexId cs-t0 and ShapeKeyVertexOffset cs-t1 
