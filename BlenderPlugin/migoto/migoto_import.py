@@ -139,12 +139,13 @@ def import_vertices(mesh, vb: VertexBuffer):
             for l in mesh.loops:
                 l.normal[:] = normals[l.vertex_index]
         elif elem.name in ('TANGENT', 'BINORMAL'):
+            pass
             #    # XXX: loops.tangent is read only. Not positive how to handle
             #    # this, or if we should just calculate it when re-exporting.
             #    for l in mesh.loops:
             #        assert(data[l.vertex_index][3] in (1.0, -1.0))
             #        l.tangent[:] = data[l.vertex_index][0:3]
-            print('NOTICE: Skipping import of %s in favour of recalculating on export' % elem.name)
+            # print('NOTICE: Skipping import of %s in favour of recalculating on export' % elem.name)
         elif elem.name.startswith('BLENDINDICES'):
             blend_indices[elem.SemanticIndex] = data
         elif elem.name.startswith('BLENDWEIGHT'):

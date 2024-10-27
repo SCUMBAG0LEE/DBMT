@@ -1,0 +1,4 @@
+疑问：
+1.SpectrumQT是如何做到把ASM完整转换成HLSL的，是全部都理解后手写HLSL还是有自动化工具？
+根据HLSL中没删干净的DebugRW来看，应该是SM4和5的 ASM以及对应HLSL全部理解了，然后一点点手写测试的。
+

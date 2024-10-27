@@ -12,7 +12,7 @@ class MMTPathProperties(bpy.types.PropertyGroup):
     path: bpy.props.StringProperty(
         name="主路径",
         description="选择DBMT的主路径",
-        default=load_path(),
+        default=load_mmt_path(),
         subtype='DIR_PATH'
     ) # type: ignore
 
@@ -25,7 +25,7 @@ class MMTPathProperties(bpy.types.PropertyGroup):
     def __init__(self) -> None:
         super().__init__()
         self.subtype = 'DIR_PATH'
-        self.path = load_path()
+        self.path = load_mmt_path()
 
 
 class MMTPathOperator(bpy.types.Operator):
@@ -48,31 +48,24 @@ class MMTPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        row = layout.row()
-
         props = context.scene.mmt_props
+        
+        # Path button to choose DBMT-GUI.exe location folder.
         layout.prop(props, "path")
 
         # 获取DBMT.exe的路径
-        mmt_path = os.path.join(context.scene.mmt_props.path, "DBMT-GUI.exe")
-        mmt_location = os.path.dirname(mmt_path)
-        if not os.path.exists(mmt_path):
-            layout.label(text="错误:请选择DBMT主路径 ", icon='ERROR')
+        dbmt_gui_exe_path = os.path.join(context.scene.mmt_props.path, "DBMT-GUI.exe")
+        if not os.path.exists(dbmt_gui_exe_path):
+            layout.label(text="错误:请选择DBMT-GUI.exe所在路径 ", icon='ERROR')
 
-        # 读取MainSetting.json中当前游戏名称
-        current_game = ""
-        main_setting_path = os.path.join(context.scene.mmt_props.path, "Configs\\Main.json")
-        if os.path.exists(main_setting_path):
-            main_setting_file = open(main_setting_path)
-            main_setting_json = json.load(main_setting_file)
-            main_setting_file.close()
-            current_game = main_setting_json["GameName"]
+        current_game = get_current_game_from_main_json()
+        if current_game != "":
             layout.label(text="当前游戏: " + current_game)
         else:
-            layout.label(text="错误:请选择DBMT主路径 ", icon='ERROR')
+            layout.label(text="错误:请选择DBMT-GUI.exe所在路径 ", icon='ERROR')
 
-        # 根据当前游戏名称，读取GameSetting中的OutputFolder路径并设置
-        output_folder_path = mmt_location + "\\Games\\" + current_game + "\\3Dmigoto\\Mods\\output\\"
+        # Get output folder path.
+        output_folder_path = get_output_folder_path()
 
         # 绘制一个CheckBox用来存储是否导出相同顶点数
         layout.separator()
@@ -102,21 +95,22 @@ class MMTPanel(bpy.types.Panel):
 
         # 添加分隔符
         layout.separator()
+        layout.label(text="导入导出分支模型集合")
 
         # TODO 导出MMD的Bone Matrix，连续骨骼变换矩阵，并生成ini文件
         # TODO 重构完成Blender插件后开发此技术
-        layout.label(text="骨骼蒙皮动画Mod")
-        layout.prop(context.scene, "mmt_mmd_animation_mod_start_frame")
-        layout.prop(context.scene, "mmt_mmd_animation_mod_end_frame")
-        layout.prop(context.scene, "mmt_mmd_animation_mod_play_speed")
-        operator_export_mmd_bone_matrix = layout.operator("mmt.export_mmd_animation_mod", text="Export Animation Mod")
-        operator_export_mmd_bone_matrix.output_folder = output_folder_path
+        # layout.label(text="骨骼蒙皮动画Mod")
+        # layout.prop(context.scene, "mmt_mmd_animation_mod_start_frame")
+        # layout.prop(context.scene, "mmt_mmd_animation_mod_end_frame")
+        # layout.prop(context.scene, "mmt_mmd_animation_mod_play_speed")
+        # operator_export_mmd_bone_matrix = layout.operator("mmt.export_mmd_animation_mod", text="Export Animation Mod")
+        # operator_export_mmd_bone_matrix.output_folder = output_folder_path
 
         # 添加分隔符
-        layout.separator()
-        layout.label(text="导入导出[新格式]")
-         # 手动导入buf文件
-        operator_import_ib_vb = self.layout.operator("import_mesh.dbmt_buffer", text="导入Buffer模型文件")
-        operator_import_ib_vb.filepath = output_folder_path
+        # layout.separator()
+        # layout.label(text="导入导出[新格式]")
+        #  # 手动导入buf文件
+        # operator_import_ib_vb = self.layout.operator("import_mesh.dbmt_buffer", text="导入Buffer模型文件")
+        # operator_import_ib_vb.filepath = output_folder_path
 
         

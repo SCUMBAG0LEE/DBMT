@@ -24,7 +24,7 @@ def save_mmt_path(path):
         file.write(json_data)
 
 
-def load_path():
+def load_mmt_path():
     # 获取当前脚本文件的路径
     script_path = os.path.abspath(__file__)
 

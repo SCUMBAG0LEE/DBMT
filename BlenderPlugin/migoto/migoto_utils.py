@@ -2,6 +2,9 @@ import re
 import numpy
 import operator  # to get function names for operators like @, +, -
 import struct
+import os
+import bpy
+import json
 
 
 def matmul(a, b):
@@ -93,3 +96,22 @@ def format_size(fmt):
     matches = components_pattern.findall(fmt)
     return sum(map(int, matches)) // 8
 
+
+# Read Main.json from DBMT folder and then get current game name.
+def get_current_game_from_main_json() ->str:
+    current_game = ""
+    main_setting_path = os.path.join(bpy.context.scene.mmt_props.path, "Configs\\Main.json")
+    if os.path.exists(main_setting_path):
+        main_setting_file = open(main_setting_path)
+        main_setting_json = json.load(main_setting_file)
+        main_setting_file.close()
+        current_game = main_setting_json["GameName"]
+    return current_game
+
+
+# Get current output folder.
+def get_output_folder_path() -> str:
+    mmt_path = bpy.context.scene.mmt_props.path
+    current_game = get_current_game_from_main_json()
+    output_folder_path = mmt_path + "Games\\" + current_game + "\\3Dmigoto\\Mods\\output\\"
+    return output_folder_path
