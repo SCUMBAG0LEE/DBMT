@@ -19,12 +19,10 @@ def mesh_triangulate(me):
 
 
 def blender_vertex_to_3dmigoto_vertex(mesh, obj, blender_loop_vertex, layout, texcoords):
-
     # 根据循环顶点中的顶点索引来从总的顶点中获取对应的顶点
     blender_vertex = mesh.vertices[blender_loop_vertex.vertex_index]
     vertex = {}
 
-    # TODO: Warn if vertex is in too many vertex groups for this layout,
     # ignoring groups with weight=0.0
     vertex_groups = sorted(blender_vertex.groups, key=lambda x: x.weight, reverse=True)
 
@@ -52,7 +50,6 @@ def blender_vertex_to_3dmigoto_vertex(mesh, obj, blender_loop_vertex, layout, te
             i = elem.SemanticIndex * 4
             vertex[elem.name] = elem.pad([x.group for x in vertex_groups[i:i + 4]], 0)
         elif elem.name.startswith('BLENDWEIGHT'):
-            # TODO: Warn if vertex is in too many vertex groups for this layout
             i = elem.SemanticIndex * 4
             vertex[elem.name] = elem.pad([x.weight for x in vertex_groups[i:i + 4]], 0.0)
         elif elem.name.startswith('TEXCOORD') and elem.is_float():
@@ -343,7 +340,7 @@ class MMTExportAllIBVBModel(bpy.types.Operator):
         return {'FINISHED'}
     
 
-# TODO
+# TODO 先完成新的import.json输出，再搞这里的
 class DBMTExportMergedModVBModel(bpy.types.Operator):
     bl_idname = "mmt.export_all_merged"
     bl_label = "Export merged model to current OutputFolder"

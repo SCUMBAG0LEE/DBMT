@@ -130,7 +130,6 @@ def import_vertices(mesh, vb: VertexBuffer):
                     alpha_layer[l.index].color = [data[l.vertex_index][3], 0, 0]
 
         elif elem.name == 'NORMAL':
-
             # TODO SnB的NORMAl有四个分量，但是它这里只导入了三个，所以导致最终导出的时候丢失了部分信息。
             # 也有可能SnB本身就是NORMAL和TANGENT的排列？
             use_normals = True
@@ -331,7 +330,6 @@ def import_3dmigoto_raw_buffers(operator, context, vb_fmt_path, ib_fmt_path, vb_
             obj.append(import_3dmigoto_vb_ib_to_obj(operator, context, [p], **kwargs))
         except Fatal as e:
             operator.report({'ERROR'}, str(e) + ': ' + str(p[:2]))
-    # FIXME: Group objects together  (Nico:这里他的意思应该是导入后自动放入一个集合里，我们也需要这个功能)
     return obj
 
 
@@ -421,10 +419,10 @@ class MMTImportAllVbModel(bpy.types.Operator):
             bpy.context.scene.collection.children.link(collection)
 
             # 读取文件夹下面所有的vb和ib文件的prefix
-            prefix_set = get_prefix_set_from_import_folder(import_folder_path)
+            import_prefix_set = get_prefix_set_from_import_folder(import_folder_path)
 
             # 遍历并导入每一个ib vb文件
-            for prefix in prefix_set:
+            for prefix in import_prefix_set:
                 vb_bin_path = import_folder_path + "\\" + prefix + '.vb'
                 ib_bin_path = import_folder_path + "\\" + prefix + '.ib'
                 fmt_path = import_folder_path + "\\" + prefix + '.fmt'
@@ -477,10 +475,9 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
             bpy.context.scene.collection.children.link(collection)
 
             # 读取文件夹下面所有的vb和ib文件的prefix
-            prefix_set = get_prefix_set_from_import_folder(import_folder_path)
+            import_prefix_set = get_prefix_set_from_import_folder(import_folder_path)
 
-            # 遍历并导入每一个ib vb文件
-            for prefix in prefix_set:
+            for prefix in import_prefix_set:
                 # Create a child collection for every part in a single drawib.
                 child_collection = bpy.data.collections.new(prefix)
 
