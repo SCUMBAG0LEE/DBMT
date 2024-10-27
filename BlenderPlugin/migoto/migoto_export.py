@@ -340,7 +340,6 @@ class MMTExportAllIBVBModel(bpy.types.Operator):
         return {'FINISHED'}
     
 
-# TODO 先完成新的import.json输出，再搞这里的
 class DBMTExportMergedModVBModel(bpy.types.Operator):
     bl_idname = "mmt.export_all_merged"
     bl_label = "Export merged model to current OutputFolder"
@@ -351,36 +350,44 @@ class DBMTExportMergedModVBModel(bpy.types.Operator):
         # 获取当前选中的对象列表
         selected_collection = bpy.context.collection
 
+        draw_ib = selected_collection.name
+        if "." in draw_ib:
+            draw_ib = draw_ib.split(".")[0]
 
         # 如果当前集合没有子集合，说明不是一个合格的分支Mod
         if len(selected_collection.children) == 0:
             raise Fatal("当前选中集合不是一个标准的分支模型集合，请检查您是否以分支集合方式导入了模型。")
         
+        # 构建一个export.json，记录当前集合所有object层级关系
+        # part_name_collection_list 装当前集合下所有的集合名称
+        # 然后是一个键值对，键是集合名称，值是一个列表，装了集合中所有mesh名称，隐藏的mesh不计入在内。
+        export_json = {}
+        for child_collection in selected_collection.children:
+            collection_obj_name_list = []
+            for obj in child_collection.objects:
+                # 判断对象是否为网格对象，并且不是隐藏状态
+                if obj.type == 'MESH' and obj.hide_get() == False:
+                    collection_obj_name_list.append(obj.name)
+            export_json[child_collection.name] = collection_obj_name_list
+
+        # 将字典转换为 JSON 格式的字符串
+        json_string = json.dumps(export_json, ensure_ascii=False, indent=4)
+
+        # 将 JSON 字符串写入文件
+        with open(output_folder_path + draw_ib + "\\" + 'export.json', 'w', encoding='utf-8') as f:
+            f.write(json_string)
+
+        # 随后直接导出所有模型
         export_time = 0
         for child_collection in selected_collection.children:
             for obj in child_collection.objects:
                 # 判断对象是否为网格对象
-                if obj.type == 'MESH':
+                if obj.type == 'MESH' and obj.hide_get() == False:
                     export_time = export_time + 1
                     bpy.context.view_layer.objects.active = obj
                     mesh = obj.data  # 获取网格数据
 
-                    self.report({'INFO'}, "export name: " + mesh.name)
-
-                    # 处理当前网格对象
-                    # 例如，打印网格名称
-
-                    name_splits = str(mesh.name).split("-")
-                    draw_ib = name_splits[0]
-                    draw_index = name_splits[1]
-                    draw_index = draw_index[0:len(draw_index) - 3]
-                    if draw_index.endswith(".vb."):
-                        draw_index = draw_index[0:len(draw_index) - 4]
-
-                    # 设置类属性的值
-                    vb_path = output_folder_path + draw_ib + "\\" + "toggle_"+ child_collection.name + "-" + draw_index + ".vb"
-                    self.report({'INFO'}, "export path: " + vb_path)
-
+                    vb_path = output_folder_path + draw_ib + "\\" + "export-" + mesh.name + ".vb"
                     ib_path = os.path.splitext(vb_path)[0] + '.ib'
                     fmt_path = os.path.splitext(vb_path)[0] + '.fmt'
                     

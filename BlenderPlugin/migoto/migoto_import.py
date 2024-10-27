@@ -419,10 +419,10 @@ class MMTImportAllVbModel(bpy.types.Operator):
             bpy.context.scene.collection.children.link(collection)
 
             # 读取文件夹下面所有的vb和ib文件的prefix
-            import_prefix_set = get_prefix_set_from_import_folder(import_folder_path)
+            import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
 
             # 遍历并导入每一个ib vb文件
-            for prefix in import_prefix_set:
+            for prefix in import_prefix_list:
                 vb_bin_path = import_folder_path + "\\" + prefix + '.vb'
                 ib_bin_path = import_folder_path + "\\" + prefix + '.ib'
                 fmt_path = import_folder_path + "\\" + prefix + '.fmt'
@@ -475,9 +475,9 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
             bpy.context.scene.collection.children.link(collection)
 
             # 读取文件夹下面所有的vb和ib文件的prefix
-            import_prefix_set = get_prefix_set_from_import_folder(import_folder_path)
+            import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
 
-            for prefix in import_prefix_set:
+            for prefix in import_prefix_list:
                 # Create a child collection for every part in a single drawib.
                 child_collection = bpy.data.collections.new(prefix)
 

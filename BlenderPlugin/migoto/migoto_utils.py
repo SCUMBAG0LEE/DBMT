@@ -139,7 +139,7 @@ def get_extract_drawib_list_from_game_config_json()->list:
         draw_ib = ib_config["DrawIB"]
         draw_ib_list.append(draw_ib)
 
-    return draw_ib_list()
+    return draw_ib_list
 
 
 # Get every drawib folder path from output folder.
@@ -184,3 +184,13 @@ def get_prefix_set_from_import_folder(import_folder_path:str) ->list:
     # Sort to make sure name is ordered by partname number.
     prefix_list.sort()
     return prefix_list
+
+
+def get_prefix_list_from_tmp_json(import_folder_path:str) ->list:
+    tmp_json_path = os.path.join(import_folder_path, "tmp.json")
+    tmp_json_file = open(tmp_json_path)
+    tmp_json = json.load(tmp_json_file)
+    tmp_json_file.close()
+
+    import_prefix_list = tmp_json["ImportModelList"]
+    return import_prefix_list
