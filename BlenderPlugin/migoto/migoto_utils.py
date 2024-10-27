@@ -6,6 +6,7 @@ import os
 import bpy
 import json
 
+from glob import glob
 
 def matmul(a, b):
     return operator.matmul(a, b)  # the same as writing a @ b
@@ -115,3 +116,40 @@ def get_output_folder_path() -> str:
     current_game = get_current_game_from_main_json()
     output_folder_path = mmt_path + "Games\\" + current_game + "\\3Dmigoto\\Mods\\output\\"
     return output_folder_path
+
+
+# Get mmt path from bpy.context.scene.mmt_props.path.
+def get_mmt_path()->str:
+    return bpy.context.scene.mmt_props.path
+
+
+# Get Games\\xxx\\Config.json path.
+def get_game_config_json_path()->str:
+    return os.path.join(bpy.context.scene.mmt_props.path, "Games\\" + get_current_game_from_main_json() + "\\Config.json")
+
+
+# get all xxx-1 from xxx-1.ib xxx-1.vb xxx-1.fmt from our drawib folder to get all possible model name prefix.
+def get_prefix_set_from_import_folder(import_folder_path:str) ->list:
+    # 读取文件夹下面所有的vb和ib文件的prefix
+    prefix_set = set()
+    # (1) 获取所有ib文件前缀列表
+    # self.report({'INFO'}, "Folder Name：" + import_folder_path)
+    # 构造需要匹配的文件路径模式
+    file_pattern = os.path.join(import_folder_path, "*.ib")
+    # 使用 glob.glob 获取匹配的文件列表
+    txt_file_list = glob(file_pattern)
+    for txt_file_path in txt_file_list:
+        # 如果文件名不包含-则属于我们自动导出的文件名，则不计入统计
+        if os.path.basename(txt_file_path).find("-") == -1:
+            continue
+
+        # self.report({'INFO'}, "txt file: " + txt_file_path)
+        txt_file_splits = os.path.basename(txt_file_path).split("-")
+        ib_file_name = txt_file_splits[0] + "-" + txt_file_splits[1]
+        ib_file_name = ib_file_name[0:len(ib_file_name) - 3]
+        prefix_set.add(ib_file_name)
+    prefix_list = list(prefix_set)
+
+    # Sort to make sure name is ordered by partname number.
+    prefix_list.sort()
+    return prefix_list

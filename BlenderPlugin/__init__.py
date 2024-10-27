@@ -44,6 +44,10 @@ register_classes = (
     MMTImportAllVbModel,
     MMTExportAllIBVBModel,
 
+    # 多合一的一键快速导入导出
+    DBMTImportAllVbModelMerged,
+    DBMTExportMergedModVBModel,
+
     # mesh_operator 右键菜单栏
     RemoveUnusedVertexGroupOperator,
     MergeVertexGroupsWithSameNumber,

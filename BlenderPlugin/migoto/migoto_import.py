@@ -1,6 +1,6 @@
 from .migoto_format import *
 from array import array
-from glob import glob
+
 
 import os.path
 import itertools
@@ -414,16 +414,11 @@ class MMTImportAllVbModel(bpy.types.Operator):
 
     def execute(self, context):
         # 首先根据MMT路径，获取
-        mmt_path = bpy.context.scene.mmt_props.path
-        current_game = ""
-        main_setting_path = os.path.join(context.scene.mmt_props.path, "Configs\\Main.json")
-        if os.path.exists(main_setting_path):
-            main_setting_file = open(main_setting_path)
-            main_setting_json = json.load(main_setting_file)
-            main_setting_file.close()
-            current_game = main_setting_json["GameName"]
+        mmt_path = get_mmt_path()
+        current_game = get_current_game_from_main_json()
 
-        game_config_path = os.path.join(context.scene.mmt_props.path, "Games\\" + current_game + "\\Config.json")
+        game_config_path = get_game_config_json_path()
+
         game_config_file = open(game_config_path)
         game_config_json = json.load(game_config_file)
         game_config_file.close()
@@ -440,34 +435,13 @@ class MMTImportAllVbModel(bpy.types.Operator):
         # self.report({'INFO'}, "读取到的drawIB文件夹总数量：" + str(len(import_folder_path_list)))
 
         for import_folder_path in import_folder_path_list:
-            # TODO 在这里导入当前文件夹下所有的ib vb文件
-            # 1.我们需要添加到一个新建的集合里，方便后续操作
             folder_draw_ib_name = os.path.basename(import_folder_path)
             collection = bpy.data.collections.new(folder_draw_ib_name)
             bpy.context.scene.collection.children.link(collection)
 
-            # 每个import_folder_path都是一个drawIB
-            # 这里我们需要获取到文件夹名称
-            # 获取文件夹名称
-
             # 读取文件夹下面所有的vb和ib文件的prefix
-            prefix_set = set()
-            # (1) 获取所有ib文件前缀列表
-            # self.report({'INFO'}, "Folder Name：" + import_folder_path)
-            # 构造需要匹配的文件路径模式
-            file_pattern = os.path.join(import_folder_path, "*.ib")
-            # 使用 glob.glob 获取匹配的文件列表
-            txt_file_list = glob(file_pattern)
-            for txt_file_path in txt_file_list:
-                # 如果文件名不包含-则属于我们自动导出的文件名，则不计入统计
-                if os.path.basename(txt_file_path).find("-") == -1:
-                    continue
+            prefix_set = get_prefix_set_from_import_folder(import_folder_path)
 
-                # self.report({'INFO'}, "txt file: " + txt_file_path)
-                txt_file_splits = os.path.basename(txt_file_path).split("-")
-                ib_file_name = txt_file_splits[0] + "-" + txt_file_splits[1]
-                ib_file_name = ib_file_name[0:len(ib_file_name) - 3]
-                prefix_set.add(ib_file_name)
             # 遍历并导入每一个ib vb文件
             for prefix in prefix_set:
                 vb_bin_path = import_folder_path + "\\" + prefix + '.vb'
@@ -496,6 +470,86 @@ class MMTImportAllVbModel(bpy.types.Operator):
                             collection.objects.link(obj)
                     else:
                         self.report({'ERROR'}, "Can't find .fmt file!")
+                except Fatal as e:
+                    self.report({'ERROR'}, str(e))
+
+        return {'FINISHED'}
+
+
+class DBMTImportAllVbModelMerged(bpy.types.Operator):
+    bl_idname = "mmt.import_all_merged"
+    bl_label = "Import all .ib .vb model from current OutputFolder,but merged sturcture."
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        mmt_path = get_mmt_path()
+        current_game = get_current_game_from_main_json()
+
+        game_config_path = get_game_config_json_path()
+        
+        game_config_file = open(game_config_path)
+        game_config_json = json.load(game_config_file)
+        game_config_file.close()
+
+        output_folder_path = mmt_path + "Games\\" + current_game + "\\3Dmigoto\\Mods\\output\\"
+
+        # 这里是根据Config.json中的DrawIB来决定导入时导入具体哪个IB
+        import_folder_path_list = []
+        for ib_config in game_config_json:
+            draw_ib = ib_config["DrawIB"]
+            # print("DrawIB:", draw_ib)
+            import_folder_path_list.append(os.path.join(output_folder_path, draw_ib))
+
+        # self.report({'INFO'}, "读取到的drawIB文件夹总数量：" + str(len(import_folder_path_list)))
+
+        for import_folder_path in import_folder_path_list:
+            # get drawib from folder name.
+            folder_draw_ib_name = os.path.basename(import_folder_path)
+
+            # create a new collection.
+            collection = bpy.data.collections.new(folder_draw_ib_name)
+
+            # link to scene.collection.
+            bpy.context.scene.collection.children.link(collection)
+
+            # 读取文件夹下面所有的vb和ib文件的prefix
+            prefix_set = get_prefix_set_from_import_folder(import_folder_path)
+
+            # 遍历并导入每一个ib vb文件
+            for prefix in prefix_set:
+                # Create a child collection for every part in a single drawib.
+                child_collection = bpy.data.collections.new(prefix)
+
+                # combine and verify if path exists.
+                vb_bin_path = import_folder_path + "\\" + prefix + '.vb'
+                ib_bin_path = import_folder_path + "\\" + prefix + '.ib'
+                fmt_path = import_folder_path + "\\" + prefix + '.fmt'
+                if not os.path.exists(vb_bin_path):
+                    raise Fatal('Unable to find matching .vb file for %s' % import_folder_path + "\\" + prefix)
+                if not os.path.exists(ib_bin_path):
+                    raise Fatal('Unable to find matching .ib file for %s' % import_folder_path + "\\" + prefix)
+                if not os.path.exists(fmt_path):
+                    fmt_path = None
+
+                # 一些需要传递过去的参数，反正这里传空的是可以用的
+                migoto_raw_import_options = {}
+
+                # 这里使用一个done的set来记录已经处理过的文件路径，如果处理过就会在里面触发continue
+                done = set()
+                try:
+                    if os.path.normcase(vb_bin_path) in done:
+                        continue
+                    done.add(os.path.normcase(vb_bin_path))
+                    if fmt_path is not None:
+                        obj_results = import_3dmigoto_raw_buffers(self, context, fmt_path, fmt_path, vb_path=vb_bin_path,
+                                                                  ib_path=ib_bin_path, **migoto_raw_import_options)
+                        for obj in obj_results:
+                            child_collection.objects.link(obj)
+                    else:
+                        self.report({'ERROR'}, "Can't find .fmt file!")
+                    
+                    # bind to parent collection
+                    collection.children.link(child_collection)
                 except Fatal as e:
                     self.report({'ERROR'}, str(e))
 
