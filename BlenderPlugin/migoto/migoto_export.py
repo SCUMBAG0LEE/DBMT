@@ -308,7 +308,7 @@ class MMTExportAllIBVBModel(bpy.types.Operator):
         export_time = 0
         for obj in selected_collection.objects:
             # 判断对象是否为网格对象
-            if obj.type == 'MESH':
+            if obj.type == 'MESH' and obj.hide_get() == False:
                 export_time = export_time + 1
                 bpy.context.view_layer.objects.active = obj
                 mesh = obj.data  # 获取网格数据
@@ -334,7 +334,7 @@ class MMTExportAllIBVBModel(bpy.types.Operator):
                 
                 export_3dmigoto(self, context, vb_path, ib_path, fmt_path)
         if export_time == 0:
-            self.report({'ERROR'}, "导出失败！请选择一个集合后再点一键导出！")
+            self.report({'ERROR'}, "导出失败！未导出任何部位！")
         else:
             self.report({'INFO'}, "一键导出成功！成功导出的部位数量：" + str(export_time))
         return {'FINISHED'}
