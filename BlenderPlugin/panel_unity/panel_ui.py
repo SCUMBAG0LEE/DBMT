@@ -88,7 +88,7 @@ class MMTPanel(bpy.types.Panel):
 
         # 一键快速导入
         layout.label(text="在OutputFolder中一键导入导出")
-        operator_fast_import = self.layout.operator("mmt.import_all", text="一键导入所有.ib & .vb模型文件")
+        operator_fast_import = self.layout.operator("mmt.import_all", text="一键导入所有模型文件")
 
         # 一键快速导出当前选中Collection中的所有model到对应的hash值文件夹中
         # TODO 直接调用MMT.exe的Mod生成方法，做到导出完即可游戏里F10刷新看效果。
@@ -99,7 +99,7 @@ class MMTPanel(bpy.types.Panel):
         layout.label(text="导入导出分支模型集合")
 
         # mmt.import_all_merged
-        operator_fast_import_merged = self.layout.operator("mmt.import_all_merged", text="一键导入所有.ib & .vb模型文件(分支)")
+        operator_fast_import_merged = self.layout.operator("mmt.import_all_merged", text="一键导入所有模型文件(分支)")
         operator_export_ibvb_merged = self.layout.operator("mmt.export_all_merged", text="一键导出选中的集合(分支)")
 
         # TODO 导出MMD的Bone Matrix，连续骨骼变换矩阵，并生成ini文件

@@ -413,28 +413,9 @@ class MMTImportAllVbModel(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        # 首先根据MMT路径，获取
-        mmt_path = get_mmt_path()
-        current_game = get_current_game_from_main_json()
+        import_drawib_folder_path_list = get_import_drawib_folder_path_list()
 
-        game_config_path = get_game_config_json_path()
-
-        game_config_file = open(game_config_path)
-        game_config_json = json.load(game_config_file)
-        game_config_file.close()
-
-        output_folder_path = mmt_path + "Games\\" + current_game + "\\3Dmigoto\\Mods\\output\\"
-
-        # 这里是根据Config.json中的DrawIB来决定导入时导入具体哪个IB
-        import_folder_path_list = []
-        for ib_config in game_config_json:
-            draw_ib = ib_config["DrawIB"]
-            # print("DrawIB:", draw_ib)
-            import_folder_path_list.append(os.path.join(output_folder_path, draw_ib))
-
-        # self.report({'INFO'}, "读取到的drawIB文件夹总数量：" + str(len(import_folder_path_list)))
-
-        for import_folder_path in import_folder_path_list:
+        for import_folder_path in import_drawib_folder_path_list:
             folder_draw_ib_name = os.path.basename(import_folder_path)
             collection = bpy.data.collections.new(folder_draw_ib_name)
             bpy.context.scene.collection.children.link(collection)
@@ -482,27 +463,10 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        mmt_path = get_mmt_path()
-        current_game = get_current_game_from_main_json()
-
-        game_config_path = get_game_config_json_path()
-        
-        game_config_file = open(game_config_path)
-        game_config_json = json.load(game_config_file)
-        game_config_file.close()
-
-        output_folder_path = mmt_path + "Games\\" + current_game + "\\3Dmigoto\\Mods\\output\\"
-
-        # 这里是根据Config.json中的DrawIB来决定导入时导入具体哪个IB
-        import_folder_path_list = []
-        for ib_config in game_config_json:
-            draw_ib = ib_config["DrawIB"]
-            # print("DrawIB:", draw_ib)
-            import_folder_path_list.append(os.path.join(output_folder_path, draw_ib))
-
+        import_drawib_folder_path_list = get_import_drawib_folder_path_list()
         # self.report({'INFO'}, "读取到的drawIB文件夹总数量：" + str(len(import_folder_path_list)))
 
-        for import_folder_path in import_folder_path_list:
+        for import_folder_path in import_drawib_folder_path_list:
             # get drawib from folder name.
             folder_draw_ib_name = os.path.basename(import_folder_path)
 

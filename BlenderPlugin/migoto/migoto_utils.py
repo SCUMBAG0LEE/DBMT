@@ -128,8 +128,35 @@ def get_game_config_json_path()->str:
     return os.path.join(bpy.context.scene.mmt_props.path, "Games\\" + get_current_game_from_main_json() + "\\Config.json")
 
 
+def get_extract_drawib_list_from_game_config_json()->list:
+    game_config_path = get_game_config_json_path()
+    game_config_file = open(game_config_path)
+    game_config_json = json.load(game_config_file)
+    game_config_file.close()
+    draw_ib_list = []
+    for ib_config in game_config_json:
+        draw_ib = ib_config["DrawIB"]
+        draw_ib_list.append(draw_ib)
+
+    return draw_ib_list()
+
+def get_import_drawib_folder_path_list()->list:
+    output_folder_path = get_output_folder_path()
+    # 这里是根据Config.json中的DrawIB来决定导入时导入具体哪个IB
+    draw_ib_list = get_extract_drawib_list_from_game_config_json()
+    import_folder_path_list = []
+    for draw_ib in draw_ib_list:
+        # print("DrawIB:", draw_ib)
+        import_folder_path_list.append(os.path.join(output_folder_path, draw_ib))
+    return import_folder_path_list
+
+
+
 # get all xxx-1 from xxx-1.ib xxx-1.vb xxx-1.fmt from our drawib folder to get all possible model name prefix.
 def get_prefix_set_from_import_folder(import_folder_path:str) ->list:
+    # TODO 应该从import.json中读取当前需要导入的文件前缀都有哪些
+    # TODO 同样导出之后应该也有一个export.json供生成二创模型时读取导出时每个模型分别属于哪个部位，这样才能不强行依赖于命名。
+
     # 读取文件夹下面所有的vb和ib文件的prefix
     prefix_set = set()
     # (1) 获取所有ib文件前缀列表

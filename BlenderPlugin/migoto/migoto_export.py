@@ -354,12 +354,14 @@ class DBMTExportMergedModVBModel(bpy.types.Operator):
         # 获取当前选中的对象列表
         selected_collection = bpy.context.collection
 
-        # TODO 这里要想遍历集合，首先我们导入的时候就应该以子集合的形式导入
-        # 所以应该先完成导入部分，再来写这里。
+
+        # 如果当前集合没有子集合，说明不是一个合格的分支Mod
+        if len(selected_collection.children) == 0:
+            raise Fatal("当前选中集合不是一个标准的分支模型集合，请检查您是否以分支集合方式导入了模型。")
+        
+        export_time = 0
         for child_collection in selected_collection.children:
-            # 遍历选中的对象
-            export_time = 0
-            for obj in selected_collection.objects:
+            for obj in child_collection.objects:
                 # 判断对象是否为网格对象
                 if obj.type == 'MESH':
                     export_time = export_time + 1
@@ -379,16 +381,17 @@ class DBMTExportMergedModVBModel(bpy.types.Operator):
                         draw_index = draw_index[0:len(draw_index) - 4]
 
                     # 设置类属性的值
-                    vb_path = output_folder_path + draw_ib + "\\" + draw_index + ".vb"
+                    vb_path = output_folder_path + draw_ib + "\\" + "toggle_"+ child_collection.name + "-" + draw_index + ".vb"
                     self.report({'INFO'}, "export path: " + vb_path)
 
                     ib_path = os.path.splitext(vb_path)[0] + '.ib'
                     fmt_path = os.path.splitext(vb_path)[0] + '.fmt'
                     
                     export_3dmigoto(self, context, vb_path, ib_path, fmt_path)
-            if export_time == 0:
+
+        if export_time == 0:
                 self.report({'ERROR'}, "导出失败！请选择一个集合后再点一键导出！")
-            else:
-                self.report({'INFO'}, "一键导出成功！成功导出的部位数量：" + str(export_time))
-            return {'FINISHED'}
+        else:
+            self.report({'INFO'}, "一键导出成功！成功导出的部位数量：" + str(export_time))
+        return {'FINISHED'}
     
