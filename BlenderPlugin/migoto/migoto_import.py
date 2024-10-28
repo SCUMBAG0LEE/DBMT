@@ -474,7 +474,6 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
             # link to scene.collection.
             bpy.context.scene.collection.children.link(collection)
 
-            # 读取文件夹下面所有的vb和ib文件的prefix
             import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
 
             for prefix in import_prefix_list:
@@ -492,10 +491,8 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
                 if not os.path.exists(fmt_path):
                     fmt_path = None
 
-                # 一些需要传递过去的参数，反正这里传空的是可以用的
                 migoto_raw_import_options = {}
 
-                # 这里使用一个done的set来记录已经处理过的文件路径，如果处理过就会在里面触发continue
                 done = set()
                 try:
                     if os.path.normcase(vb_bin_path) in done:

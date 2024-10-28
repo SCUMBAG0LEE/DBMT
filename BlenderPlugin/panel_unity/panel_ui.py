@@ -83,16 +83,17 @@ class MMTPanel(bpy.types.Panel):
         operator_export_ibvb = self.layout.operator("export_mesh.migoto_mmt", text="导出 .ib & .vb 模型文件")
         operator_export_ibvb.filepath = output_folder_path + "1.vb"
 
-        # 添加分隔符
-        layout.separator()
+        if current_game not in ["HI3","GI","HSR","ZZZ"]:
+            # 添加分隔符
+            layout.separator()
 
-        # 一键快速导入
-        layout.label(text="在OutputFolder中一键导入导出")
-        operator_fast_import = self.layout.operator("mmt.import_all", text="一键导入所有模型文件")
+            # 一键快速导入
+            layout.label(text="在OutputFolder中一键导入导出")
+            operator_fast_import = self.layout.operator("mmt.import_all", text="一键导入所有模型文件")
 
-        # 一键快速导出当前选中Collection中的所有model到对应的hash值文件夹中
-        # TODO 直接调用MMT.exe的Mod生成方法，做到导出完即可游戏里F10刷新看效果。
-        operator_export_ibvb = self.layout.operator("mmt.export_all", text="一键导出选中的集合")
+            # 一键快速导出当前选中Collection中的所有model到对应的hash值文件夹中
+            # TODO 直接调用MMT.exe的Mod生成方法，做到导出完即可游戏里F10刷新看效果。
+            operator_export_ibvb = self.layout.operator("mmt.export_all", text="一键导出选中的集合")
 
         # 添加分隔符
         layout.separator()
