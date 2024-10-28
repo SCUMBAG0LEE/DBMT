@@ -204,9 +204,6 @@ def select_collection_objects(collection):
     collection : bpy.types.Collection
         要选择的对象所在的集合。
     """
-    # 首先取消所有对象的选择
-    for obj in bpy.data.objects:
-        obj.select_set(False)
 
     # 使用递归函数来遍历集合及其子集合
     def recurse_collection(col):
