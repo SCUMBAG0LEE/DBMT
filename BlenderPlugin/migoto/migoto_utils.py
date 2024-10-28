@@ -194,3 +194,26 @@ def get_prefix_list_from_tmp_json(import_folder_path:str) ->list:
 
     import_prefix_list = tmp_json["ImportModelList"]
     return import_prefix_list
+
+
+def select_collection_objects(collection):
+    """
+    选择给定集合及其所有子集合下的所有对象。
+    
+    参数:
+    collection : bpy.types.Collection
+        要选择的对象所在的集合。
+    """
+    # 首先取消所有对象的选择
+    for obj in bpy.data.objects:
+        obj.select_set(False)
+
+    # 使用递归函数来遍历集合及其子集合
+    def recurse_collection(col):
+        for obj in col.objects:
+            obj.select_set(True)
+        for subcol in col.children_recursive:
+            recurse_collection(subcol)
+
+    # 从提供的集合开始递归
+    recurse_collection(collection)

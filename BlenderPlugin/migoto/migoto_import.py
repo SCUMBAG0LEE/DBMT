@@ -506,12 +506,17 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
                                                                   ib_path=ib_bin_path, **migoto_raw_import_options)
                         for obj in obj_results:
                             child_collection.objects.link(obj)
+                            
                     else:
                         self.report({'ERROR'}, "Can't find .fmt file!")
                     
                     # bind to parent collection
                     collection.children.link(child_collection)
+                    
+                    
                 except Fatal as e:
                     self.report({'ERROR'}, str(e))
+            # Select all objects under collection.
+            select_collection_objects(collection)
 
         return {'FINISHED'}
