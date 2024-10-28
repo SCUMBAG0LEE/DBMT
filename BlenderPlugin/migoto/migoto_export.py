@@ -367,7 +367,7 @@ class DBMTExportMergedModVBModel(bpy.types.Operator):
             for obj in child_collection.objects:
                 # 判断对象是否为网格对象，并且不是隐藏状态
                 if obj.type == 'MESH' and obj.hide_get() == False:
-                    collection_obj_name_list.append(obj.name)
+                    collection_obj_name_list.append("export-" +obj.name)
             export_json[child_collection.name] = collection_obj_name_list
 
         # 将字典转换为 JSON 格式的字符串
