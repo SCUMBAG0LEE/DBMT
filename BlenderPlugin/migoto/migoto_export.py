@@ -363,12 +363,17 @@ class DBMTExportMergedModVBModel(bpy.types.Operator):
         # 然后是一个键值对，键是集合名称，值是一个列表，装了集合中所有mesh名称，隐藏的mesh不计入在内。
         export_json = {}
         for child_collection in selected_collection.children:
+
+            export_part_name = child_collection.name
+            if "." in export_part_name:
+                export_part_name = export_part_name[0:len(export_part_name) - 4]
+
             collection_obj_name_list = []
             for obj in child_collection.objects:
                 # 判断对象是否为网格对象，并且不是隐藏状态
                 if obj.type == 'MESH' and obj.hide_get() == False:
                     collection_obj_name_list.append("export-" +obj.name)
-            export_json[child_collection.name] = collection_obj_name_list
+            export_json[export_part_name] = collection_obj_name_list
 
         # 将字典转换为 JSON 格式的字符串
         json_string = json.dumps(export_json, ensure_ascii=False, indent=4)
