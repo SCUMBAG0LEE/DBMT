@@ -95,14 +95,14 @@ class MMTPanel(bpy.types.Panel):
             # 一键快速导出当前选中Collection中的所有model到对应的hash值文件夹中
             # TODO 直接调用MMT.exe的Mod生成方法，做到导出完即可游戏里F10刷新看效果。
             operator_export_ibvb = self.layout.operator("mmt.export_all", text="一键导出选中的集合")
+        else:
+            # 添加分隔符
+            layout.separator()
+            layout.label(text="导入导出分支模型集合")
 
-        # 添加分隔符
-        layout.separator()
-        layout.label(text="导入导出分支模型集合")
-
-        # mmt.import_all_merged
-        operator_fast_import_merged = self.layout.operator("mmt.import_all_merged", text="一键导入所有模型文件(分支)")
-        operator_export_ibvb_merged = self.layout.operator("mmt.export_all_merged", text="一键导出选中的集合(分支)")
+            # mmt.import_all_merged
+            operator_fast_import_merged = self.layout.operator("mmt.import_all_merged", text="一键导入所有模型文件(分支)")
+            operator_export_ibvb_merged = self.layout.operator("mmt.export_all_merged", text="一键导出选中的集合(分支)")
 
         # TODO 导出MMD的Bone Matrix，连续骨骼变换矩阵，并生成ini文件
         # TODO 重构完成Blender插件后开发此技术
