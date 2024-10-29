@@ -363,8 +363,10 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
 
     def get_vb_ib_paths_from_fmt_prefix(self, filename):
         model_prefix = get_model_prefix_from_fmt_file(filename)
-        print("model_prefix:" + model_prefix)
+        # print("model_prefix:" + model_prefix)
+
         fmt_dir_name = os.path.dirname(filename)
+        
         vb_bin_path = ""
         ib_bin_path = ""
         fmt_path = ""

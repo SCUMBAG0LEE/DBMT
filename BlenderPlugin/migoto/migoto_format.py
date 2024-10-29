@@ -19,24 +19,37 @@ class InputLayoutElement(object):
             self.from_dict(arg)
 
         self.encoder, self.decoder = EncoderDecoder(self.Format)
-
-    @staticmethod
-    def next_validate(f, field):
-        line = next(f).strip()
-        assert (line.startswith(field + ': '))
-        return line[len(field) + 2:]
     
+    def read_attribute_line(self, f) -> bool:
+        line = next(f).strip()
+        if line.startswith('SemanticName: '):
+            self.SemanticName = line[len('SemanticName: ') :]
+            # print("SemanticName:" + self.SemanticName)
+        elif line.startswith('SemanticIndex: '):
+            self.SemanticIndex = line[len('SemanticIndex: ') :]
+            # print("SemanticIndex:" + self.SemanticIndex)
+            self.SemanticIndex = int(self.SemanticIndex)
+        elif line.startswith('Format: '):
+            self.Format = line[len('Format: '):]
+            # print("Format:" + self.Format)
+        elif line.startswith('AlignedByteOffset: '):
+            self.AlignedByteOffset = line[len('AlignedByteOffset: ') :]
+            # print("AlignedByteOffset:" + self.AlignedByteOffset)
+            if self.AlignedByteOffset == 'append':
+                raise Fatal('Input layouts using "AlignedByteOffset=append" are not yet supported')
+            self.AlignedByteOffset = int(self.AlignedByteOffset)
+        elif line.startswith('InputSlotClass: '):
+            self.InputSlotClass = line[len('InputSlotClass: ') :]
+            # print("InputSlotClass:" + self.InputSlotClass)
+            # return false if we meet end of all element
+            return False
+        return True
+        
+        
     def from_file(self, f):
-        self.SemanticName = self.next_validate(f, 'SemanticName')
-        self.SemanticIndex = int(self.next_validate(f, 'SemanticIndex'))
-        self.Format = self.next_validate(f, 'Format')
-        self.next_validate(f, 'InputSlot') # 仅用于兼容,无效值
-        self.AlignedByteOffset = self.next_validate(f, 'AlignedByteOffset')
-        if self.AlignedByteOffset == 'append':
-            raise Fatal('Input layouts using "AlignedByteOffset=append" are not yet supported')
-        self.AlignedByteOffset = int(self.AlignedByteOffset)
-        self.InputSlotClass = self.next_validate(f, 'InputSlotClass')
-        self.next_validate(f, 'InstanceDataStepRate') # 仅用于兼容,无效值
+        while(self.read_attribute_line(f)):
+            pass
+        # print("-------------------")
 
     def to_dict(self):
         d = {'SemanticName': self.SemanticName, 'SemanticIndex': self.SemanticIndex, 'Format': self.Format,

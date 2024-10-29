@@ -82,7 +82,7 @@ def EncoderDecoder(fmt):
     if snorm8_pattern.match(fmt):
         return (lambda data: numpy.around((numpy.fromiter(data, numpy.float32) * 127.0)).astype(numpy.int8).tobytes(),
                 lambda data: (numpy.frombuffer(data, numpy.int8) / 127.0).tolist())
-
+    print(fmt)
     raise Fatal('File uses an unsupported DXGI Format: %s' % fmt)
 
 
