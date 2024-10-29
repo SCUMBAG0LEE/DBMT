@@ -251,13 +251,13 @@ def read_vertexbuffer_indexbuffer(operator, paths):
     return vb, ib, os.path.basename(vb_bin_path)
 
 
-def import_3dmigoto_vb_ib_to_obj(operator, context, paths, flip_texcoord_v=True, axis_forward='-Z', axis_up='Y'):
+def import_3dmigoto_vb_ib_to_obj(operator, context, paths, mesh_name:str, flip_texcoord_v=True, axis_forward='-Z', axis_up='Y'):
 
     # 获取vb和ib抽象出的数据，顺便获取最终导入后的名称为 .vb结尾
     vb, ib, name = read_vertexbuffer_indexbuffer(operator, paths)
 
     # 创建mesh和Object对象，用于后续填充
-    mesh = bpy.data.meshes.new(name)
+    mesh = bpy.data.meshes.new(mesh_name)
     obj = bpy.data.objects.new(mesh.name, mesh)
 
     # 设置坐标系
@@ -322,12 +322,14 @@ def import_3dmigoto_vb_ib_to_obj(operator, context, paths, flip_texcoord_v=True,
 
 
 def import_3dmigoto_raw_buffers(operator, context, vb_fmt_path, ib_fmt_path, vb_path=None, ib_path=None, **kwargs):
+
+    improt_name = os.path.basename(vb_fmt_path)
     # 这里的True好像是use_bin?
     paths = (((vb_path, vb_fmt_path), (ib_path, ib_fmt_path), True),)
     obj = []
     for p in paths:
         try:
-            obj.append(import_3dmigoto_vb_ib_to_obj(operator, context, [p], **kwargs))
+            obj.append(import_3dmigoto_vb_ib_to_obj(operator, context, [p], mesh_name=improt_name, **kwargs))
         except Fatal as e:
             operator.report({'ERROR'}, str(e) + ': ' + str(p[:2]))
     return obj
@@ -366,7 +368,7 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
         # print("model_prefix:" + model_prefix)
 
         fmt_dir_name = os.path.dirname(filename)
-        
+
         vb_bin_path = ""
         ib_bin_path = ""
         fmt_path = ""
@@ -407,7 +409,7 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
                 (vb_path, ib_path, fmt_path) = self.get_vb_ib_paths_from_fmt_prefix(fmt_file_path)
                 if os.path.normcase(vb_path) in done:
                     continue
-                done.add(os.path.normcase(vb_path))
+                done.add(os.path.normcase(fmt_path))
 
                 if fmt_path is not None:
                     # 导入的调用链就从这里开始
