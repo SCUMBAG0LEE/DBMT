@@ -83,6 +83,7 @@ class MMTPanel(bpy.types.Panel):
         operator_export_ibvb = self.layout.operator("export_mesh.migoto_mmt", text="导出 .ib & .vb 模型文件")
         operator_export_ibvb.filepath = output_folder_path + "1.vb"
 
+        # hoyogames use new architecture so can't use old import export method.
         if current_game not in ["HI3","GI","HSR","ZZZ"]:
             # 添加分隔符
             layout.separator()

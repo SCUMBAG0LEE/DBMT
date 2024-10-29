@@ -200,6 +200,12 @@ def select_collection_objects(collection):
 
 # Read model prefix attribute in fmt file to locate .ib and .vb file.
 # Save lots of space when reverse mod which have same stride but different kinds of D3D11GameType.
-def read_ib_vb_prefix_from_fmt_file()->str:
-    
-    pass
+def get_model_prefix_from_fmt_file(fmt_file_path:str)->str:
+    with open(fmt_file_path, 'r') as file:
+        for i in range(10):  
+            line = file.readline().strip()
+            if not line:
+                continue
+            if line.startswith('prefix:'):
+                return line.split(':')[1].strip()  
+    return ""  

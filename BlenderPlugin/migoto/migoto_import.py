@@ -339,9 +339,12 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
     bl_label = "导入3Dmigoto的原始Buffer文件"
     bl_options = {'UNDO'}
 
-    filename_ext = '.vb;.ib;.fmt'
+    # new architecture only need .fmt file to locate.
+    filename_ext = '.fmt'
+
+
     filter_glob: StringProperty(
-        default='*.vb;*.ib;*.fmt',
+        default='*.fmt',
         options={'HIDDEN'},
     ) # type: ignore
 
@@ -358,11 +361,23 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
         default=True,
     ) # type: ignore
 
-    # 判断相关文件是否存在
-    def get_vb_ib_paths(self, filename):
-        vb_bin_path = os.path.splitext(filename)[0] + '.vb'
-        ib_bin_path = os.path.splitext(filename)[0] + '.ib'
-        fmt_path = os.path.splitext(filename)[0] + '.fmt'
+    def get_vb_ib_paths_from_fmt_prefix(self, filename):
+        model_prefix = get_model_prefix_from_fmt_file(filename)
+        print("model_prefix:" + model_prefix)
+        fmt_dir_name = os.path.dirname(filename)
+        vb_bin_path = ""
+        ib_bin_path = ""
+        fmt_path = ""
+
+        if model_prefix == "":
+            vb_bin_path = os.path.splitext(filename)[0] + '.vb'
+            ib_bin_path = os.path.splitext(filename)[0] + '.ib'
+            fmt_path = os.path.splitext(filename)[0] + '.fmt'
+        else:
+            vb_bin_path = os.path.join(fmt_dir_name, model_prefix + '.vb')
+            ib_bin_path = os.path.join(fmt_dir_name, model_prefix + '.ib')
+            fmt_path = filename
+        
         if not os.path.exists(vb_bin_path):
             raise Fatal('Unable to find matching .vb file for %s' % filename)
         if not os.path.exists(ib_bin_path):
@@ -371,20 +386,23 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
             fmt_path = None
         return (vb_bin_path, ib_bin_path, fmt_path)
 
+
     def execute(self, context):
         migoto_raw_import_options = self.as_keywords(ignore=('filepath', 'files', 'filter_glob'))
 
         # 我们需要添加到一个新建的集合里，方便后续操作
         # 这里集合的名称需要为当前文件夹的名称
-        collection_name = os.path.basename(os.path.dirname(self.filepath))
+        dirname = os.path.dirname(self.filepath)
+
+        collection_name = os.path.basename(dirname)
         collection = bpy.data.collections.new(collection_name)
         bpy.context.scene.collection.children.link(collection)
 
         done = set()
-        dirname = os.path.dirname(self.filepath)
-        for filename in self.files:
+        for fmt_file in self.files:
             try:
-                (vb_path, ib_path, fmt_path) = self.get_vb_ib_paths(os.path.join(dirname, filename.name))
+                fmt_file_path = os.path.join(dirname, fmt_file.name)
+                (vb_path, ib_path, fmt_path) = self.get_vb_ib_paths_from_fmt_prefix(fmt_file_path)
                 if os.path.normcase(vb_path) in done:
                     continue
                 done.add(os.path.normcase(vb_path))
