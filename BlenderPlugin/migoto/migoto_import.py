@@ -1,7 +1,6 @@
 from .migoto_format import *
 from array import array
 
-
 import os.path
 import itertools
 import bpy
@@ -157,6 +156,7 @@ def import_vertices(mesh, vb: VertexBuffer):
 
     return (blend_indices, blend_weights, texcoords, vertex_layers, use_normals)
 
+
 def find_texture(texture_prefix, texture_suffix, directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -165,7 +165,8 @@ def find_texture(texture_prefix, texture_suffix, directory):
                 return texture_path
     return None
 
-def create_material_with_texture(obj, mesh_name, directory):
+
+def create_material_with_texture(obj, mesh_name:str, directory:str):
     # Изменим имя текстуры, чтобы оно точно совпадало с шаблоном (Change the texture name to match the template exactly)
     material_name = f"{mesh_name}_Material"
     # texture_name = f"{mesh_name}-DiffuseMap.jpg"
@@ -234,35 +235,25 @@ def create_material_with_texture(obj, mesh_name, directory):
                 obj.data.materials.append(material)
 
 
-def read_vertexbuffer_indexbuffer(operator, paths):
-    vb_paths, ib_paths, use_bin = zip(*paths)
-    if len(vb_paths) != 1 or len(ib_paths) > 1:
-        raise Fatal('暂不支持从加载的bin文件中融合多个文件')
+def import_3dmigoto_raw_buffers(operator, context, fmt_path:str, vb_path:str, ib_path:str, flip_texcoord_v=True, **kwargs):
+    vb = VertexBuffer(open(fmt_path, 'r'))
+    vb.parse_vb_bin(open(vb_path, 'rb'))
 
-    vb_bin_path, vb_txt_path = vb_paths[0]
-    ib_bin_path, ib_txt_path = ib_paths[0]
-
-    vb = VertexBuffer(open(vb_txt_path, 'r'), load_vertices=False)
-    vb.parse_vb_bin(open(vb_bin_path, 'rb'))
-
-    ib = IndexBuffer(open(ib_txt_path, 'r'), load_indices=False)
-    ib.parse_ib_bin(open(ib_bin_path, 'rb'))
-
-    return vb, ib, os.path.basename(vb_bin_path)
+    ib = IndexBuffer(open(fmt_path, 'r'))
+    ib.parse_ib_bin(open(ib_path, 'rb'))
 
 
-def import_3dmigoto_vb_ib_to_obj(operator, context, paths, mesh_name:str, flip_texcoord_v=True, axis_forward='-Z', axis_up='Y'):
-
-    # 获取vb和ib抽象出的数据，顺便获取最终导入后的名称为 .vb结尾
-    vb, ib, name = read_vertexbuffer_indexbuffer(operator, paths)
+    # get import prefix
+    mesh_name = os.path.basename(fmt_path)
+    if mesh_name.endswith(".fmt"):
+        mesh_name = mesh_name[0:len(mesh_name) - 4]
 
     # 创建mesh和Object对象，用于后续填充
     mesh = bpy.data.meshes.new(mesh_name)
     obj = bpy.data.objects.new(mesh.name, mesh)
 
     # 设置坐标系
-    global_matrix = axis_conversion(from_forward=axis_forward, from_up=axis_up).to_4x4()
-    obj.matrix_world = global_matrix
+    obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
 
     # Attach the vertex buffer layout to the object for later exporting. Can't
     # seem to retrieve this if attached to the mesh - to_mesh() doesn't copy it:
@@ -281,9 +272,7 @@ def import_3dmigoto_vb_ib_to_obj(operator, context, paths, mesh_name:str, flip_t
     import_vertex_groups(mesh, obj, blend_indices, blend_weights)
 
     # Validate closes the loops so they don't disappear after edit mode and probably other important things:
-    mesh.validate(verbose=False, clean_customdata=False)  # *Very* important to not remove lnors here!
-    # 这里的lnors可能指的是mesh.loop里的normal？
-    # Not actually sure update is necessary. It seems to update the vertex normals, not sure what else:
+    mesh.validate(verbose=False, clean_customdata=False)  
     mesh.update()
 
     # Must be done after validate step:
@@ -296,46 +285,15 @@ def import_3dmigoto_vb_ib_to_obj(operator, context, paths, mesh_name:str, flip_t
     else:
         mesh.calc_normals()
 
-    # TODO 这里用到bmesh的部分删了也没事，到底有什么用呢？
-    # 对比导出部分来看，可能是想要三角化？但是暂时没遇到问题，就先删掉吧。
-    # import bmesh
-    # # 创建 BMesh 副本
-    # bm = bmesh.new()
-    # bm.from_mesh(mesh)
-    # # 将 BMesh 更新回原始网格
-    # bm.to_mesh(mesh)
-    # bm.free()
-
     # 设置导入时的顶点数和索引数，用于插件右键对比是否和原本顶点数量一致
     obj['3DMigoto:OriginalVertexNumber'] = len(mesh.vertices)
     obj['3DMigoto:OriginalIndicesNumber'] = len(mesh.loops)
 
-    # 自动贴图导入
-    mesh_prefix: str = str(mesh.name).split(".")[0]
     # operator.report({'INFO'}, mesh_prefix)
-    create_material_with_texture(obj, mesh_prefix, os.path.dirname(paths[0][0][0]))
-    
-    # 弹出导入成功
-    operator.report({'INFO'}, "导入成功!")
+    create_material_with_texture(obj, mesh_name=mesh_name,directory= os.path.dirname(fmt_path))
 
     return obj
 
-
-def import_3dmigoto_raw_buffers(operator, context, vb_fmt_path, ib_fmt_path, vb_path=None, ib_path=None, **kwargs):
-    improt_name = os.path.basename(vb_fmt_path)
-    
-    if improt_name.endswith(".fmt"):
-        improt_name = improt_name[0:len(improt_name) - 4]
-
-    # 这里的True好像是use_bin?
-    paths = (((vb_path, vb_fmt_path), (ib_path, ib_fmt_path), True),)
-    obj = []
-    for p in paths:
-        try:
-            obj.append(import_3dmigoto_vb_ib_to_obj(operator, context, [p], mesh_name=improt_name, **kwargs))
-        except Fatal as e:
-            operator.report({'ERROR'}, str(e) + ': ' + str(p[:2]))
-    return obj
 
 
 class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
@@ -346,7 +304,6 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
 
     # new architecture only need .fmt file to locate.
     filename_ext = '.fmt'
-
 
     filter_glob: StringProperty(
         default='*.fmt',
@@ -395,6 +352,7 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
 
 
     def execute(self, context):
+        
         migoto_raw_import_options = self.as_keywords(ignore=('filepath', 'files', 'filter_glob'))
 
         # 我们需要添加到一个新建的集合里，方便后续操作
@@ -407,6 +365,7 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
 
         done = set()
         for fmt_file in self.files:
+            
             try:
                 fmt_file_path = os.path.join(dirname, fmt_file.name)
                 (vb_path, ib_path, fmt_path) = self.get_vb_ib_paths_from_fmt_prefix(fmt_file_path)
@@ -416,17 +375,14 @@ class Import3DMigotoRaw(bpy.types.Operator, ImportHelper):
 
                 if fmt_path is not None:
                     # 导入的调用链就从这里开始
-                    obj_results = import_3dmigoto_raw_buffers(self, context, fmt_path, fmt_path, vb_path=vb_path, ib_path=ib_path, **migoto_raw_import_options)
-                    for obj in obj_results:
-                        # 因为之前导入的过程中链接到scene了，所以必选在这里先断开链接否则会出现两个实例
-                        # bpy.context.scene.collection.objects.unlink(obj)
-                        # 再链接到集合，就能显示在集合下面了
-                        collection.objects.link(obj)
+                    obj_result = import_3dmigoto_raw_buffers(self, context, fmt_path=fmt_path, vb_path=vb_path, ib_path=ib_path, **migoto_raw_import_options)
+                    collection.objects.link(obj_result)
                         
                 else:
                     self.report({'ERROR'}, "未找到.fmt文件，无法导入")
             except Fatal as e:
                 self.report({'ERROR'}, str(e))
+            
         return {'FINISHED'}
     
 
@@ -468,10 +424,9 @@ class MMTImportAllVbModel(bpy.types.Operator):
                         continue
                     done.add(os.path.normcase(vb_bin_path))
                     if fmt_path is not None:
-                        obj_results = import_3dmigoto_raw_buffers(self, context, fmt_path, fmt_path, vb_path=vb_bin_path,
+                        obj_result = import_3dmigoto_raw_buffers(self, context, fmt_path=fmt_path, vb_path=vb_bin_path,
                                                                   ib_path=ib_bin_path, **migoto_raw_import_options)
-                        for obj in obj_results:
-                            collection.objects.link(obj)
+                        collection.objects.link(obj_result)
                     else:
                         self.report({'ERROR'}, "Can't find .fmt file!")
                 except Fatal as e:
@@ -524,10 +479,9 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
                         continue
                     done.add(os.path.normcase(vb_bin_path))
                     if fmt_path is not None:
-                        obj_results = import_3dmigoto_raw_buffers(self, context, fmt_path, fmt_path, vb_path=vb_bin_path,
+                        obj_result = import_3dmigoto_raw_buffers(self, context, fmt_path=fmt_path, vb_path=vb_bin_path,
                                                                   ib_path=ib_bin_path, **migoto_raw_import_options)
-                        for obj in obj_results:
-                            child_collection.objects.link(obj)
+                        child_collection.objects.link(obj_result)
                             
                     else:
                         self.report({'ERROR'}, "Can't find .fmt file!")

@@ -176,7 +176,7 @@ class VertexBuffer(object):
     # Python gotcha - do not set layout=InputLayout() in the default function
     # parameters, as they would all share the *same* InputLayout since the
     # default values are only evaluated once on file load
-    def __init__(self, f=None, layout=None, load_vertices=True):
+    def __init__(self, f=None, layout=None):
         self.vertices = []
         self.layout = layout and layout or InputLayout()
         self.first = 0
@@ -185,9 +185,9 @@ class VertexBuffer(object):
         self.topology = 'trianglelist'
 
         if f is not None:
-            self.parse_vb_txt(f, load_vertices)
+            self.parse_vb_txt(f)
 
-    def parse_vb_txt(self, f, load_vertices):
+    def parse_vb_txt(self, f):
         for line in map(str.strip, f):
             # print(line)
             if line.startswith('byte offset:'):
@@ -216,12 +216,6 @@ class VertexBuffer(object):
             if not vertex:
                 break
             self.vertices.append(self.layout.decode(vertex))
-        # We intentionally disregard the vertex count when loading from a
-        # binary file, as we assume frame analysis might have only dumped a
-        # partial buffer to the .txt files (e.g. if this was from a dump where
-        # the draw call index count was overridden it may be cut short, or
-        # where the .txt files contain only sub-meshes from each draw call and
-        # we are loading the .buf file because it contains the entire mesh):
         self.vertex_count = len(self.vertices)
 
     def append(self, vertex):
@@ -270,7 +264,7 @@ class VertexBuffer(object):
         
 
 class IndexBuffer(object):
-    def __init__(self, *args, load_indices=True):
+    def __init__(self, *args):
         self.faces = []
         self.first = 0
         self.index_count = 0
@@ -280,7 +274,7 @@ class IndexBuffer(object):
 
         if isinstance(args[0], io.IOBase):
             assert (len(args) == 1)
-            self.parse_ib_txt(args[0], load_indices)
+            self.parse_fmt(args[0])
         else:
             self.format, = args
 
@@ -290,7 +284,7 @@ class IndexBuffer(object):
         self.faces.append(face)
         self.index_count += len(face)
 
-    def parse_ib_txt(self, f, load_indices):
+    def parse_fmt(self, f):
         for line in map(str.strip, f):
             if line.startswith('byte offset:'):
                 self.offset = int(line[13:])
@@ -305,9 +299,7 @@ class IndexBuffer(object):
             elif line.startswith('format:'):
                 self.format = line[8:]
             elif line == '':
-                if not load_indices:
                     return
-                self.parse_index_data(f)
         assert (len(self.faces) * 3 == self.index_count)
 
     def parse_ib_bin(self, f):
@@ -336,11 +328,6 @@ class IndexBuffer(object):
         # we are loading the .buf file because it contains the entire mesh):
         self.index_count = len(self.faces) * 3
 
-    def parse_index_data(self, f):
-        for line in map(str.strip, f):
-            face = tuple(map(int, line.split()))
-            assert (len(face) == 3)
-            self.faces.append(face)
 
     def write(self, output, operator=None):
         for face in self.faces:
