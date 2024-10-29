@@ -322,8 +322,11 @@ def import_3dmigoto_vb_ib_to_obj(operator, context, paths, mesh_name:str, flip_t
 
 
 def import_3dmigoto_raw_buffers(operator, context, vb_fmt_path, ib_fmt_path, vb_path=None, ib_path=None, **kwargs):
-
     improt_name = os.path.basename(vb_fmt_path)
+    
+    if improt_name.endswith(".fmt"):
+        improt_name = improt_name[0:len(improt_name) - 4]
+
     # 这里的True好像是use_bin?
     paths = (((vb_path, vb_fmt_path), (ib_path, ib_fmt_path), True),)
     obj = []
