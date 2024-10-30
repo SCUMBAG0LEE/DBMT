@@ -317,13 +317,11 @@ class MMTExportAllIBVBModel(bpy.types.Operator):
 
                 # 处理当前网格对象
                 # 例如，打印网格名称
-
-                name_splits = str(mesh.name).split("-")
-                draw_ib = name_splits[0]
-                draw_index = name_splits[1]
-                draw_index = draw_index[0:len(draw_index) - 3]
-                if draw_index.endswith(".vb."):
-                    draw_index = draw_index[0:len(draw_index) - 4]
+                original_name_without_suffix = mesh.name
+                if "." in mesh.name: 
+                    original_name_without_suffix = str(mesh.name).split(".")[0]
+                draw_ib = original_name_without_suffix.split("-")[0]
+                draw_index = original_name_without_suffix.split("-")[1]
 
                 # 设置类属性的值
                 vb_path = output_folder_path + draw_ib + "\\" + draw_index + ".vb"
