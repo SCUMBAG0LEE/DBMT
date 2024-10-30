@@ -177,14 +177,18 @@ def get_prefix_set_from_import_folder(import_folder_path:str) ->list:
 
 # Read import model name list from tmp.json.
 def get_prefix_list_from_tmp_json(import_folder_path:str) ->list:
+    
     tmp_json_path = os.path.join(import_folder_path, "tmp.json")
-    tmp_json_file = open(tmp_json_path)
-    tmp_json = json.load(tmp_json_file)
-    tmp_json_file.close()
+    if os.path.exists(tmp_json_path):
+        tmp_json_file = open(tmp_json_path)
+        tmp_json = json.load(tmp_json_file)
+        tmp_json_file.close()
 
-    import_prefix_list = tmp_json["ImportModelList"]
-    # import_prefix_list.sort() it's naturally sorted in DBMT so we don't need sort here.
-    return import_prefix_list
+        import_prefix_list = tmp_json["ImportModelList"]
+        # import_prefix_list.sort() it's naturally sorted in DBMT so we don't need sort here.
+        return import_prefix_list
+    else:
+        return []
 
 
 # Recursive select every object in a collection and it's sub collections.

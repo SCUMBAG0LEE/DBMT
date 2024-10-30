@@ -356,8 +356,8 @@ class DBMTExportMergedModVBModel(bpy.types.Operator):
 
         # 如果当前集合没有子集合，说明不是一个合格的分支Mod
         if len(selected_collection.children) == 0:
-            raise Fatal("当前选中集合不是一个标准的分支模型集合，请检查您是否以分支集合方式导入了模型。")
-        
+            self.report({'ERROR'},"当前选中集合不是一个标准的分支模型集合，请检查您是否以分支集合方式导入了模型。")
+            return {'FINISHED'}
         # 构建一个export.json，记录当前集合所有object层级关系
         # part_name_collection_list 装当前集合下所有的集合名称
         # 然后是一个键值对，键是集合名称，值是一个列表，装了集合中所有mesh名称，隐藏的mesh不计入在内。

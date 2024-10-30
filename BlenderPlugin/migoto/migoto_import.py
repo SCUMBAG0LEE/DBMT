@@ -401,6 +401,7 @@ class MMTImportAllVbModel(bpy.types.Operator):
 
             # 读取文件夹下面所有的vb和ib文件的prefix
             import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
+           
 
             # 遍历并导入每一个ib vb文件
             for prefix in import_prefix_list:
@@ -445,16 +446,20 @@ class DBMTImportAllVbModelMerged(bpy.types.Operator):
         # self.report({'INFO'}, "读取到的drawIB文件夹总数量：" + str(len(import_folder_path_list)))
 
         for import_folder_path in import_drawib_folder_path_list:
+            import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
+
             # get drawib from folder name.
             folder_draw_ib_name = os.path.basename(import_folder_path)
+
+            if len(import_prefix_list) == 0:
+                self.report({'ERROR'},"当前output文件夹"+folder_draw_ib_name+"中的内容暂不支持一键导入分支模型")
+                continue
 
             # create a new collection.
             collection = bpy.data.collections.new(folder_draw_ib_name)
 
             # link to scene.collection.
             bpy.context.scene.collection.children.link(collection)
-
-            import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
 
             for prefix in import_prefix_list:
                 # Create a child collection for every part in a single drawib.
