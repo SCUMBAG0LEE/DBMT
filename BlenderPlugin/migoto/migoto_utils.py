@@ -179,14 +179,23 @@ def get_prefix_set_from_import_folder(import_folder_path:str) ->list:
 def get_prefix_list_from_tmp_json(import_folder_path:str) ->list:
     
     tmp_json_path = os.path.join(import_folder_path, "tmp.json")
+
+    drawib = os.path.basename(import_folder_path)
+
     if os.path.exists(tmp_json_path):
         tmp_json_file = open(tmp_json_path)
         tmp_json = json.load(tmp_json_file)
         tmp_json_file.close()
-
         import_prefix_list = tmp_json["ImportModelList"]
-        # import_prefix_list.sort() it's naturally sorted in DBMT so we don't need sort here.
-        return import_prefix_list
+        if len(import_prefix_list) == 0:
+            import_partname_prefix_list = []
+            partname_list = tmp_json["PartNameList"]
+            for partname in partname_list:
+                import_partname_prefix_list.append(drawib + "-" + partname)
+            return import_partname_prefix_list
+        else:
+            # import_prefix_list.sort() it's naturally sorted in DBMT so we don't need sort here.
+            return import_prefix_list
     else:
         return []
 

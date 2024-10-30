@@ -401,7 +401,7 @@ class MMTImportAllVbModel(bpy.types.Operator):
 
             # 读取文件夹下面所有的vb和ib文件的prefix
             import_prefix_list = get_prefix_list_from_tmp_json(import_folder_path)
-           
+            print(import_prefix_list)
 
             # 遍历并导入每一个ib vb文件
             for prefix in import_prefix_list:
