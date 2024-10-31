@@ -8,7 +8,11 @@ from enum import Enum, auto
 
 from .dict_filter import DictFilter, FilterCondition, Filter
 
+# 包装类型。
+def SlotId(slot_id):
+    return int(slot_id)
 
+# 字符串常量起别名映射架构。
 class ShaderType(Enum):
     Empty = 'null'
     Compute = 'cs'
@@ -18,17 +22,6 @@ class ShaderType(Enum):
     Hull = 'hs'
     Domain = 'ds'
 
-
-class BufferType(Enum):
-    Blend = auto()
-    Normal = auto()
-    Position = auto()
-    TexCoord = auto()
-    ShapeKeyGroup = auto()
-    ShapeKeyVertId = auto()
-    ShapeKeyColor = auto()
-
-
 class SlotType(Enum):
     ConstantBuffer = 'cb'
     IndexBuffer = 'ib'
@@ -36,11 +29,6 @@ class SlotType(Enum):
     Texture = 't'
     RenderTarget = 'o'
     UAV = 'u'
-
-
-def SlotId(slot_id):
-    return int(slot_id)
-
 
 shader_type_codepage = {
     'cs': ShaderType.Compute,
@@ -61,6 +49,19 @@ slot_type_codepage = {
 }
 
 
+# Buffer文件的类型
+class BufferType(Enum):
+    Blend = auto()
+    Normal = auto()
+    Position = auto()
+    TexCoord = auto()
+    ShapeKeyGroup = auto()
+    ShapeKeyVertId = auto()
+    ShapeKeyColor = auto()
+
+
+# 字符串解析，传入字符串，根据内容解析是什么Shader类型
+# 放在一个类里，比较方便？
 class ShaderRef:
     def __init__(self, raw_shader_ref):
         self.raw = raw_shader_ref
@@ -111,9 +112,12 @@ class ResourceData:
         self.len = len(self.bytes)
 
 
+# 用于解析文件名，比如：000001-cs-cb1=ce09aecf-cs=09d91b2eee7e232f.buf
+# 应该叫做文件解析器： FilenameParser
 class ResourceDescriptor:
     def __init__(self, resource_file_path, calculate_sha256=False):
         self.path = resource_file_path
+        # self.raw就是原始文件名，不带路那种：000001-cs-cb1=ce09aecf-cs=09d91b2eee7e232f.buf
         self.raw = os.path.basename(resource_file_path)
         self.marked = False
         self.call = None
@@ -128,6 +132,7 @@ class ResourceDescriptor:
         self.shaders = []
         if calculate_sha256:
             self.hash_data()
+        # 调用解析函数
         self.parse_raw_call()
         self.validate()
 
@@ -194,6 +199,7 @@ class ResourceDescriptor:
         # Match call id
         call_id_pattern = re.compile(r'^(\d+)-(.*)\.([a-z0-9]+)')
         result = call_id_pattern.findall(raw_call)
+        # 差分后内容像这样 [('000001', 'cs-cb1=ce09aecf-cs=09d91b2eee7e232f', 'buf')]
         # Return if call id not found
         if len(result) != 1:
             return
@@ -201,12 +207,14 @@ class ResourceDescriptor:
         if len(result) != 3:
             return
         # Store results
+        #  [('000001', 'cs-cb1=ce09aecf-cs=09d91b2eee7e232f', 'buf')]
         call_id = result[0]
         raw_refs = result[1]
         ext = result[2]
         # Match shader refs
         shaders_pattern = re.compile(r'-([a-z]s=[a-f0-9]+)')
         raw_shaders_refs = shaders_pattern.findall(raw_refs)
+        # 结果是 ['cs=09d91b2eee7e232f']
         # Return if no shader refs found
         if len(raw_shaders_refs) < 1:
             return
@@ -267,7 +275,9 @@ class ResourceDescriptor:
     def copy_file(self, dest_path):
         shutil.copyfile(self.path, dest_path)
 
-
+# 抽象类，输入是000001,000123这样的调用id，然后它再对资源进行一次包装
+# 后面用的时候就能根据call id来访问对应的资源文件和Shader类型等等属性了
+# 很面向对象的设计，就是有点恶心，看代码太耗时间了。
 class CallDescriptor:
     def __init__(self, call_id):
         self.id = call_id

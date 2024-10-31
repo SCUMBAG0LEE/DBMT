@@ -46,6 +46,7 @@ class ShaderCallBranch:
 
 
 @dataclass
+# 调用收集器
 class CallsCollector:
     dump: Dump
     shader_data_pattern: Dict[str, ShaderMap]

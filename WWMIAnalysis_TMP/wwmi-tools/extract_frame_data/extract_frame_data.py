@@ -58,15 +58,15 @@ configuration = Configuration(
     shader_data_pattern={
         'SHAPEKEY_CS_0': ShaderMap(ShaderType.Compute,
                                    inputs=[],
-                                   outputs=[Slot('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(0))]),
+                                   outputs=[Slot('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(0))]), # cs-u0
         'SHAPEKEY_CS_1': ShaderMap(ShaderType.Compute,
-                                   inputs=[Slot('SHAPEKEY_CS_0', ShaderType.Empty, SlotType.UAV, SlotId(1))],
-                                   outputs=[Slot('SHAPEKEY_CS_2', ShaderType.Empty, SlotType.UAV, SlotId(0))]),
+                                   inputs=[Slot('SHAPEKEY_CS_0', ShaderType.Empty, SlotType.UAV, SlotId(1))], # cs-u1
+                                   outputs=[Slot('SHAPEKEY_CS_2', ShaderType.Empty, SlotType.UAV, SlotId(0))]), # cs-u0
         'SHAPEKEY_CS_2': ShaderMap(ShaderType.Compute,
-                                   inputs=[Slot('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(0))],
-                                   outputs=[Slot('DRAW_VS_DUMMY', ShaderType.Empty, SlotType.UAV, SlotId(0))]),
+                                   inputs=[Slot('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(0))], #cs-u0
+                                   outputs=[Slot('DRAW_VS_DUMMY', ShaderType.Empty, SlotType.UAV, SlotId(0))]),#cs-u0
         'DRAW_VS_DUMMY': ShaderMap(ShaderType.Vertex,
-                             inputs=[Slot('SHAPEKEY_CS_2', ShaderType.Empty, SlotType.VertexBuffer, SlotId(6)),],
+                             inputs=[Slot('SHAPEKEY_CS_2', ShaderType.Empty, SlotType.VertexBuffer, SlotId(6)),], # vb6文件，也就是装形态键那个文件
                              outputs=[]),
         'DRAW_VS': ShaderMap(ShaderType.Vertex,
                              # Hack: When shader is short cirquited on itself, calls with listed input slots will be excluded from resulting branch
@@ -76,7 +76,7 @@ configuration = Configuration(
     },
     shader_resources={
         'SHAPEKEY_OFFSET_BUFFER': DataMap([
-                Source('SHAPEKEY_CS_1', ShaderType.Compute, SlotType.ConstantBuffer, SlotId(0)),
+                Source('SHAPEKEY_CS_1', ShaderType.Compute, SlotType.ConstantBuffer, SlotId(0)),# cs-cb0
             ],
             BufferElementLayout([
                 BufferSemantic(AbstractSemantic(Semantic.RawData), DXGIFormat.R32_UINT),
@@ -260,6 +260,10 @@ def extract_frame_data(cfg):
     # Get data view from dump data model
     frame_data = DataCollector(
         dump=dump,
+        # 接收Dump资源的抽象类，接收资源配置
+        # 这里的configuration相当于写好了要从什么什么里面提取，提取多少内容
+        # 太抽象了，面向对象刻在骨子里了吗。。
+        # 我愿称之，抽象之王，把Java工作习惯刻在骨子里的代码。
         shader_data_pattern=configuration.shader_data_pattern,
         shader_resources=configuration.shader_resources
     )
