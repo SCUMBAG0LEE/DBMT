@@ -1,0 +1,22 @@
+{
+  "BackUp": false,
+  "DeleteOutputFolder": true,
+  "AutoTextureOnlyConvertDiffuseMap": true,
+  "MMTWindowTopMost": false,
+  "ShareSourceModel": true,
+  "Author": "NicoMico",
+  "AuthorLink": "https://afdian.com/a/NicoMico666",
+  "OpenModOutputFolderAfterGenerateMod": false,
+  "DynamicVertexLimitBreak": true,
+  "AutoTextureFormat": 1,
+  "ModelFileNameStyle": 1,
+  "MoveIBRelatedFiles": true,
+  "ConvertDedupedTextures": true,
+  "DontSplitModelByMatchFirstIndex": true,
+  "ForbidAutoTexture": false,
+  "UseHashTexture": true,
+  "AutoCleanFrameAnalysisFolder": true,
+  "FrameAnalysisFolderReserveNumber": 1,
+  "AutoCleanLogFile": true,
+  "LogFileReserveNumber": 3
+}

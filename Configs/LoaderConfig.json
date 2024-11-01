@@ -1,0 +1,58 @@
+[
+  {
+    "LoaderConfigName": "GF2",
+    "module": "d3d11.dll",
+    "target": "D:\\GF2Exilium\\GF2 Game\\GF2_Exilium.exe",
+    "launch_args": "",
+    "launch": "D:\\GF2Exilium\\PCLauncher.exe",
+    "require_admin": true
+  },
+  {
+    "LoaderConfigName": "GLC",
+    "module": "d3d11.dll",
+    "target": "C:\\Program Files\\AetherGazerStarter\\AetherGazer1\\AetherGazer.exe",
+    "launch_args": "",
+    "launch": "C:\\Program Files\\AetherGazerStarter\\AetherGazerStarter.exe",
+    "require_admin": true
+  },
+  {
+    "LoaderConfigName": "GF2_Dpan",
+    "module": "d3d11.dll",
+    "target": "D//",
+    "launch_args": "",
+    "launch": "XX",
+    "require_admin": true
+  },
+  {
+    "LoaderConfigName": "GLC2",
+    "module": "d3d11.dll",
+    "target": "Test223123123",
+    "launch_args": "",
+    "launch": "122",
+    "require_admin": true
+  },
+  {
+    "LoaderConfigName": "GLC23",
+    "module": "d3d11.dll",
+    "target": "",
+    "launch_args": "",
+    "launch": "",
+    "require_admin": true
+  },
+  {
+    "LoaderConfigName": "AetherGazer",
+    "module": "d3d11.dll",
+    "target": "C:\\Program Files\\AetherGazerStarter\\AetherGazer1\\AetherGazer.exe",
+    "launch_args": "",
+    "launch": "C:\\Program Files\\AetherGazerStarter\\AetherGazerStarter.exe",
+    "require_admin": true
+  },
+  {
+    "LoaderConfigName": "Naraka-Wangyi",
+    "module": "d3d11.dll",
+    "target": "D:\\Naraka\\program\\NarakaBladepoint.exe",
+    "launch_args": "",
+    "launch": "D:\\Naraka\\LauncherGame.exe",
+    "require_admin": true
+  }
+]

@@ -18,11 +18,23 @@ dcl_tgsm_structured g0, 4, 128
 //声明共享内存,ComputeShader中独有的机制
 dcl_tgsm_structured g1, 4, 128
 dcl_thread_group 2, 32, 1
+
 ult r0.x, vThreadIDInGroupFlattened.x, l(32)
-if_nz r0.x //处理前64个内容
+//https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/ult--sm4---asm-
+//当前GroupIndex索引如果小于32，则r0.x 为1，否则为0
+//结合之前的NumThreads声明 2，32，1 等于z *32 * 2 + y * 2 + x，那么当前dispatch是多少呢？ 1,1103,1
+// 这里有个要注意的点，vThreadIDInGroupFlattened只有一个值.x能够调用，所以这里出现的才是.x
+//当前索引小于32，emmmm，那么z轴线程必须是0，不然直接超了
+//y轴必须小于16，那么 y必须得是1，不然直接超了，那么x必须得是小于32长度的内容
+
+//不管如何，一共最多有64个线程，这里判断线程数小于32，说明只处理一半数据。
+
+if_nz r0.x 
   ishl r0.x, vThreadIDInGroupFlattened.x, l(2) 
   //https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/ishl--sm5---asm-
   //r0.x = vThreadIDInGroupFlattened.x * 4 (左移相当于乘以2的2次方)
+
+
   mov r0.y, l(0)
   loop
   //https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/loop--sm4---asm-
