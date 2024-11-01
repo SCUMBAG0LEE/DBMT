@@ -90,6 +90,7 @@ class MeshObject:
         Imports shapekeys data based on hash and ensures its uniqueness
         """
         for component_data in self.components_data:
+            # 判断vb6槽位是否存在
             if component_data.draw_data.shapekey_hash is not None:
                 if self.shapekey_hash is None:
                     self.shapekey_hash = component_data.draw_data.shapekey_hash

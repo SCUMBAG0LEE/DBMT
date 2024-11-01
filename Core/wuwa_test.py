@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # ShapeKeyVertexId      fixed stride = 4                                Slot:cs-t0
     # ShapeKeyVertexOffset  fixed stride = 2                                Slot:cs-t1
     # ShapeKeyScale         fixed stride = 4                                Slot:cs-u1
-    # ShapeKeyBuffer        fixed stride = 24                               Slot:vb6 / hash replace
+    # ShapeKeyBuffer        fixed stride = 24                               Slot:vb6 / hash replace  from  cs-u0
 
     # WuWa original settings:
     # 

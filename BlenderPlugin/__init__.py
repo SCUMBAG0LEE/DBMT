@@ -20,7 +20,7 @@ bl_info = {
     "name": "DBMT-Blender-Plugin",
     "description": "DBMT的Blender插件 目前只支持3.6LTS版本",
     "blender": (3, 6, 0),
-    "version": (1, 0, 0, 9),
+    "version": (1, 0, 1, 1),
     "location": "View3D",
     "category": "Generic"
 }

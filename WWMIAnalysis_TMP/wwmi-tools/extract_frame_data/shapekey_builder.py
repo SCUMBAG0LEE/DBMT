@@ -75,6 +75,7 @@ class ShapeKeyBuilder:
         for shapekey_hash, shapekey_data in self.shapekey_data.items():
 
             shapekey_offsets = shapekey_data.shapekey_offset_buffer.get_values(AbstractSemantic(Semantic.RawData))[0:128]
+            
             vertex_ids = shapekey_data.shapekey_vertex_id_buffer.get_values(AbstractSemantic(Semantic.RawData))
             vertex_offsets = shapekey_data.shapekey_vertex_offset_buffer.get_values(AbstractSemantic(Semantic.RawData))
 

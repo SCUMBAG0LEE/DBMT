@@ -94,18 +94,18 @@ configuration = Configuration(
                 BufferSemantic(AbstractSemantic(Semantic.RawData), DXGIFormat.R16G16B16_FLOAT),
             ])),
 
-        'SHAPEKEY_OUTPUT': DataMap([Source('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(0))]),
-        'SHAPEKEY_SCALE_OUTPUT': DataMap([Source('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(1))]),
+        'SHAPEKEY_OUTPUT': DataMap([Source('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(0))]), # cs-u0
+        'SHAPEKEY_SCALE_OUTPUT': DataMap([Source('SHAPEKEY_CS_1', ShaderType.Empty, SlotType.UAV, SlotId(1))]), #cs-u1
 
 
-        'SHAPEKEY_INPUT': DataMap([Source('DRAW_VS', ShaderType.Empty, SlotType.VertexBuffer, SlotId(6), ignore_missing=True)]),
+        'SHAPEKEY_INPUT': DataMap([Source('DRAW_VS', ShaderType.Empty, SlotType.VertexBuffer, SlotId(6), ignore_missing=True)]), # vb6
 
-        'POSE_INPUT_0': DataMap([Source('DRAW_VS', ShaderType.Empty, SlotType.VertexBuffer, SlotId(0))]),
+        'POSE_INPUT_0': DataMap([Source('DRAW_VS', ShaderType.Empty, SlotType.VertexBuffer, SlotId(0))]), # vs-vb0
 
-        'SKELETON_DATA': DataMap([Source('DRAW_VS', ShaderType.Vertex, SlotType.ConstantBuffer, SlotId(4))]),
+        'SKELETON_DATA': DataMap([Source('DRAW_VS', ShaderType.Vertex, SlotType.ConstantBuffer, SlotId(4))]), #vs-cb4
 
         'SKELETON_DATA_BUFFER': DataMap([
-                Source('DRAW_VS', ShaderType.Vertex, SlotType.ConstantBuffer, SlotId(4)),
+                Source('DRAW_VS', ShaderType.Vertex, SlotType.ConstantBuffer, SlotId(4)), #vs-cb4 骨骼变换矩阵
             ],
             BufferElementLayout(
                 semantics=[
@@ -114,7 +114,7 @@ configuration = Configuration(
                 force_stride=True)),
 
         'POSE_CB': DataMap([
-                Source('DRAW_VS', ShaderType.Vertex, SlotType.ConstantBuffer, SlotId(0)),
+                Source('DRAW_VS', ShaderType.Vertex, SlotType.ConstantBuffer, SlotId(0)), # vs-cb0
             ],
             BufferElementLayout([
                 BufferSemantic(AbstractSemantic(Semantic.RawData), DXGIFormat.R32G32B32A32_UINT)
@@ -285,6 +285,11 @@ def extract_frame_data(cfg):
         shapekeys=shapekeys.shapekeys,
         draw_data=data_extractor.draw_data
     )
+
+    # 我只能说，到这一层已经是 过度包装+没有注释+没有测试代码+没有逻辑流程注释，导致代码变成屎山了
+    # 还需要别人去走一遍逆向分析流程，不能直接拿来用
+    # 软性GateKeep，Fake OpenSource
+
 
     # Build output data object
     output_builder = OutputBuilder(
