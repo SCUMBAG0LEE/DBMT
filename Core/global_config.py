@@ -1,23 +1,11 @@
 from dataclasses import dataclass, field
 import os
 
-from dbmt_file_utils import dbmt_fileutil__list_files
+from Core.Utils.dbmt_file_utils import dbmt_fileutil__list_files
+from Common.d3d11_game_type import D3D11GameType,D3D11Element
 
 # Nico: Thanks for SpectrumQT's WWMI project, I learned how to use @dataclass to save my time 
-# and lots of other python features so use python can works as good as C++.
-
-@dataclass
-class GlobalConfig:
-    LoaderFolder:str
-    FrameAnalysisFolder:str
-    GameName:str
-
-    WorkFolder:str = field(default='', init=False)
-    DedupedFolder:str= field(default='', init=False)
-
-    def __post_init__(self):
-        self.WorkFolder = self.LoaderFolder + self.FrameAnalysisFolder + "\\"
-        self.DedupedFolder = self.WorkFolder + "deduped\\" 
+# and lots of other python features so use python can works as good as C++ and better and faster.
 
 @dataclass
 class FrameAnalysisUtil:
@@ -41,6 +29,28 @@ class FrameAnalysisUtil:
         for ib_related_filename in ib_related_filename_list:
             indexlist.append(ib_related_filename[0:6])
         return indexlist
+
+
+@dataclass
+class GlobalConfig:
+    # We put all loader in a fixed folder structure so can locate them only by game name.
+    GameName:str
+    # This folder contains all 3dmigoto loader seperated by game name.
+    InitialFolderPath:str
+    # Where 3Dmigoto's d3d11.dll located.
+    LoaderFolder:str = field(init=False)
+    # eg: FrameAnalysis-2024-10-30-114032.
+    FrameAnalysisFolder:str = field(init=False)
+    # path of 3Dmigoto's d3d11.dll located folder + current work frame analysis folder.
+    WorkFolder:str = field(init=False)
+    # deduped folder path of current frame analysis folder.
+    DedupedFolder:str= field(init=False)
+
+    D3D11GameTypeList:list[D3D11GameType] = field(init=False,repr=False)
+
+    def __post_init__(self):
+        self.WorkFolder = self.LoaderFolder + self.FrameAnalysisFolder + "\\"
+        self.DedupedFolder = self.WorkFolder + "deduped\\" 
 
 
 
