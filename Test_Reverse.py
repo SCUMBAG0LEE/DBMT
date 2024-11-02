@@ -15,8 +15,11 @@ if __name__ == "__main__":
     # 1.fill a dict thant contains category name and buf file path
 
     category_name_buf_file_path_dict = {}
-    category_name_buf_file_path_dict["Position"] = os.path.join(mod_root_folder, "FireflyBodyPosition.buf")
-    category_name_buf_file_path_dict["Texcoord"] = os.path.join(mod_root_folder, "FireflyBodyTexcoord.buf")
+    # category_name_buf_file_path_dict["Position"] = os.path.join(mod_root_folder, "FireflyBodyPosition.buf")
+    # category_name_buf_file_path_dict["Texcoord"] = os.path.join(mod_root_folder, "FireflyBodyTexcoord.buf")
+    # category_name_buf_file_path_dict["Blend"] = os.path.join(mod_root_folder, "FireflyBodyBlend.buf")
+    category_name_buf_file_path_dict["Position"] = os.path.join(mod_root_folder, "FireflyHairPosition.buf")
+    category_name_buf_file_path_dict["Texcoord"] = os.path.join(mod_root_folder, "FireflyHairTexcoord.buf")
     category_name_buf_file_path_dict["Blend"] = os.path.join(mod_root_folder, "FireflyHairBlend.buf")
 
     # trigger auto game type detect to know which GameType it use.
@@ -25,5 +28,5 @@ if __name__ == "__main__":
         GameLoaderPath="C:\\Users\\Administrator\\Desktop\\LoadersDev\\",
         ConfigFolderPath="C:\\Users\\Administrator\\Desktop\\DBMT-GUI\\Configs\\")
     
-    gametype:str = g.D3D11GameTypeConfig.detect_game_type_reverse(category_name_buf_file_path_dict)
-    print(gametype)
+    matched_gametypename_list = g.D3D11GameTypeConfig.detect_game_type(category_name_buf_file_path_dict=category_name_buf_file_path_dict,reverse=True)
+    print(matched_gametypename_list)

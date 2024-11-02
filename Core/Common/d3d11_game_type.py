@@ -192,8 +192,44 @@ class D3D11GameTypeLv2:
         return unique_gametype_list
 
 
-    def detect_game_type_reverse(self,category_name_buf_file_path_dict:Dict[str,str]) -> str:
+    def detect_game_type(self,category_name_buf_file_path_dict:Dict[str,str],reverse=False) -> list[str]:
+        matched_gametypename_list:list[str] = []
         # Reverse game type detect will need to remove d3d11gametype which have same d3d11ElementList and same PatcBLENDWEIGHTS.
-        unique_gametype_list:List[D3D11GameType] = self.get_unique_gametype_list()
-        for d3d11gametype in unique_gametype_list:
-            print(d3d11gametype.GameTypeName)
+        gametype_list:List[D3D11GameType] = self.CurrentD3D11GameTypeList
+        if reverse:
+            gametype_list:List[D3D11GameType] = self.get_unique_gametype_list()
+
+        for d3d11gametype in gametype_list:
+            # category number must be qeual
+            if len(d3d11gametype.CategoryStrideDict) != len(category_name_buf_file_path_dict):
+                continue
+
+            # calculate vertex count by current d3d11gametype's Position stride,
+            # if vertex count is correct,then every other category's file stride should match with current category
+            # under this vertex count number.
+            position_file_path:str = category_name_buf_file_path_dict.get("Position","")
+            position_file_size:int = os.path.getsize(position_file_path)
+            stride:int = d3d11gametype.CategoryStrideDict.get("Position",0)
+            vertex_count = position_file_size / stride
+            # print("PositionStride:" + str(stride) + " VertexCount:" + str(vertex_count))
+
+            all_category_match:bool = True
+            for category_name in d3d11gametype.CategoryStrideDict:
+                category_stride = d3d11gametype.CategoryStrideDict.get(category_name,0)
+                category_file_path:str = category_name_buf_file_path_dict.get(category_name,"")
+                category_file_size:int = os.path.getsize(category_file_path)
+                file_stride = category_file_size / vertex_count
+                
+                if category_name == "Blend" and d3d11gametype.PatchBLENDWEIGHTS:
+                    category_stride = d3d11gametype.ElementNameD3D11ElementDict["BLENDINDICES"]
+
+                if category_stride != file_stride:
+                    # print(d3d11gametype.GameTypeName + " can't match: " + category_name + " original_stride:" +str(category_stride) + " file_stride:" + str(file_stride))
+                    all_category_match = False
+                    break
+            if all_category_match:
+                matched_gametypename_list.append(d3d11gametype.GameTypeName)
+        
+        return matched_gametypename_list
+                
+
