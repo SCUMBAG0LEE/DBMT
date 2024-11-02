@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
 import os
 
+from dataclasses import dataclass, field
+from typing import List,Dict
 
 from ..utils.dbmt_file_utils import dbmt_fileutil__list_files
 from ..common.d3d11_game_type import D3D11GameType,D3D11Element,D3D11GameTypeLv2
@@ -88,7 +89,3 @@ class GlobalConfig:
     def initialize_d3d11_gametype(self):
         gametype_folder_path = os.path.join(self.ConfigFolderPath, "ExtractTypes\\" + self.GameName + "\\")
         self.D3D11GameTypeConfig = D3D11GameTypeLv2(GameTypeConfigFolderPath=gametype_folder_path)
-
-        
-
-
