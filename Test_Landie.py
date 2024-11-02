@@ -1,5 +1,5 @@
-from global_config import GlobalConfig,FrameAnalysisUtil
-from Core.Utils.dbmt_log_utils import log_newline,log_info
+from Core.common.global_config import GlobalConfig,FrameAnalysisUtil
+from Core.utils.dbmt_log_utils import log_newline,log_info
 
 import os
 
